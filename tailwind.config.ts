@@ -8,14 +8,12 @@ export default {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
-        display: ["Playfair Display", "serif"],
-        body: ["DM Sans", "sans-serif"],
+        display: ["Fredoka", "sans-serif"],
+        body: ["Nunito", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -61,14 +59,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        gold: "hsl(var(--gold))",
-        "gold-light": "hsl(var(--gold-light))",
+        sky: "hsl(var(--sky))",
+        green: "hsl(var(--green))",
+        orange: "hsl(var(--orange))",
+        pink: "hsl(var(--pink))",
+        purple: "hsl(var(--purple))",
+        yellow: "hsl(var(--yellow))",
         teal: "hsl(var(--teal))",
-        "teal-light": "hsl(var(--teal-light))",
-        navy: "hsl(var(--navy))",
-        "navy-light": "hsl(var(--navy-light))",
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
+        red: "hsl(var(--red))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -84,20 +82,21 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "fade-in": {
-          from: { opacity: "0", transform: "translateY(10px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+        "bounce-in": {
+          "0%": { opacity: "0", transform: "scale(0.8) translateY(10px)" },
+          "60%": { transform: "scale(1.05) translateY(-2px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
         },
-        "slide-in": {
-          from: { opacity: "0", transform: "translateX(-20px)" },
-          to: { opacity: "1", transform: "translateX(0)" },
+        "wiggle": {
+          "0%, 100%": { transform: "rotate(-2deg)" },
+          "50%": { transform: "rotate(2deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-in": "slide-in 0.4s ease-out forwards",
+        "bounce-in": "bounce-in 0.5s ease-out forwards",
+        "wiggle": "wiggle 0.5s ease-in-out",
       },
     },
   },
