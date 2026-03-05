@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import PortalLayout from "./components/portal/PortalLayout";
@@ -15,6 +15,9 @@ import Fees from "./pages/Fees";
 import Assignments from "./pages/Assignments";
 import Profile from "./pages/Profile";
 import SettingsPage from "./pages/SettingsPage";
+import Diary from "./pages/Diary";
+import AdminSendDiary from "./pages/AdminSendDiary";
+import AdminSendAnnouncement from "./pages/AdminSendAnnouncement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,7 @@ const App = () => (
             <Route path="/" element={<Login />} />
             <Route element={<PortalLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/diary" element={<Diary />} />
               <Route path="/grades" element={<Grades />} />
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/timetable" element={<Timetable />} />
@@ -38,6 +42,8 @@ const App = () => (
               <Route path="/assignments" element={<Assignments />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/admin/diary" element={<AdminSendDiary />} />
+              <Route path="/admin/announcement" element={<AdminSendAnnouncement />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
