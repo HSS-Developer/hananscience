@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   // Filter diary/announcements for student's class
   const myDiary = diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
-  const myAnnouncements = announcements.filter((a) => user && d => true);
+  // removed unused variable
   const studentAnnouncements = isAdmin ? announcements : announcements.filter((a) => user && a.targetClasses.includes(user.class));
   const todayDiary = myDiary.find((d) => d.date === "2026-03-05");
 
