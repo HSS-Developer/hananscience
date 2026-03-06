@@ -10,7 +10,7 @@ const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transiti
 const Dashboard = () => {
   const { user, diaryEntries, announcements } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "principal";
 
   // Filter diary/announcements for student's class
   const myDiary = diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
@@ -38,7 +38,7 @@ const Dashboard = () => {
       <motion.div variants={item}>
         <div className="p-6 rounded-2xl gradient-fun shadow-elevated">
           <h1 className="text-2xl lg:text-3xl font-display font-bold text-primary-foreground">
-            {isAdmin ? "Welcome, Admin! 🛡️" : `Assalam-o-Alaikum, ${user?.name?.split(" ")[0]}! 🌟`}
+            {isAdmin ? (user?.role === "principal" ? "Welcome, Principal! 👑" : "Welcome, Admin! 🛡️") : `Assalam-o-Alaikum, ${user?.name?.split(" ")[0]}! 🌟`}
           </h1>
           <p className="text-primary-foreground/80 font-body mt-1">
             {isAdmin

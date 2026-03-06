@@ -9,6 +9,8 @@ export const classDisplayName = (c: ClassLevel) => {
   return `Class ${c}`;
 };
 
+export type UserRole = "student" | "admin" | "principal";
+
 export interface DiaryEntry {
   id: string;
   date: string;
@@ -28,11 +30,23 @@ export interface Announcement {
   createdBy: string;
 }
 
+export interface Student {
+  id: string;
+  name: string;
+  email: string;
+  class: ClassLevel;
+  section: string;
+  rollNumber: string;
+  fatherName: string;
+  phone?: string;
+  password: string;
+}
+
 interface User {
   id: string;
   name: string;
   email: string;
-  role: "student" | "admin";
+  role: UserRole;
   class: ClassLevel;
   rollNumber: string;
   section?: string;
@@ -48,30 +62,67 @@ interface AuthContextType {
   announcements: Announcement[];
   addDiaryEntry: (entry: Omit<DiaryEntry, "id">) => void;
   addAnnouncement: (entry: Omit<Announcement, "id">) => void;
+  students: Student[];
+  addStudent: (student: Omit<Student, "id">) => void;
+  removeStudent: (id: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const mockUsers: Record<string, User & { password: string }> = {
-  "student@hanan.edu": {
+const defaultStudents: Student[] = [
+  {
     id: "1",
     name: "Ahmed Hassan",
-    email: "student@hanan.edu",
-    password: "student123",
-    role: "student",
+    email: "ahmed@hanan.edu",
     class: "3",
-    rollNumber: "HSS-2026-0042",
     section: "A",
+    rollNumber: "HSS-2026-0042",
     fatherName: "Mr. Hassan Ahmed",
+    phone: "03001234567",
+    password: "student123",
   },
-  "admin@hanan.edu": {
+  {
     id: "2",
+    name: "Ayesha Siddiqui",
+    email: "ayesha@hanan.edu",
+    class: "5",
+    section: "A",
+    rollNumber: "HSS-2026-0078",
+    fatherName: "Mr. Siddiqui Ali",
+    phone: "03009876543",
+    password: "student123",
+  },
+  {
+    id: "3",
+    name: "Muhammad Ali",
+    email: "ali@hanan.edu",
+    class: "1",
+    section: "B",
+    rollNumber: "HSS-2026-0015",
+    fatherName: "Mr. Ali Khan",
+    phone: "03211234567",
+    password: "student123",
+  },
+];
+
+const adminUsers: Record<string, User & { password: string }> = {
+  "admin@hanan.edu": {
+    id: "admin-1",
     name: "Dr. Fatima Khan",
     email: "admin@hanan.edu",
     password: "admin123",
     role: "admin",
     class: "PG",
     rollNumber: "ADM-001",
+  },
+  "principal@hanan.edu": {
+    id: "principal-1",
+    name: "Prof. Abdul Rehman",
+    email: "principal@hanan.edu",
+    password: "principal123",
+    role: "principal",
+    class: "PG",
+    rollNumber: "PRI-001",
   },
 };
 
@@ -117,16 +168,16 @@ const initialAnnouncements: Announcement[] = [
   {
     id: "a1",
     title: "🎉 Annual Sports Day!",
-    content: "Sports Day will be held on March 20th. All students must wear white PT uniform. Bring water bottles and caps!",
+    content: "Sports Day will be held on March 20th. All students must wear white PT uniform.",
     date: "2026-03-05",
-    targetClasses: ["PG", "Nursery", "KG", "1", "2", "3", "4", "5", "6", "7", "8"],
+    targetClasses: ALL_CLASSES,
     priority: "high",
     createdBy: "Principal",
   },
   {
     id: "a2",
     title: "📝 Mid-Term Exams Schedule",
-    content: "Mid-term exams will start from March 25th. Date sheet has been sent. Please prepare well!",
+    content: "Mid-term exams will start from March 25th. Date sheet has been sent.",
     date: "2026-03-04",
     targetClasses: ["1", "2", "3", "4", "5", "6", "7", "8"],
     priority: "high",
@@ -134,21 +185,12 @@ const initialAnnouncements: Announcement[] = [
   },
   {
     id: "a3",
-    title: "🧥 Winter Uniform Change",
-    content: "From March 15th, students should switch to summer uniform. White shirt with grey pants/skirt.",
+    title: "🧥 Summer Uniform Change",
+    content: "From March 15th, students should switch to summer uniform.",
     date: "2026-03-03",
-    targetClasses: ["PG", "Nursery", "KG", "1", "2", "3", "4", "5", "6", "7", "8"],
+    targetClasses: ALL_CLASSES,
     priority: "medium",
     createdBy: "Administration",
-  },
-  {
-    id: "a4",
-    title: "🎨 Art Competition for Junior Classes",
-    content: "Drawing competition on the topic 'My School' for PG to Class 3. Bring your own colors and sheets!",
-    date: "2026-03-02",
-    targetClasses: ["PG", "Nursery", "KG", "1", "2", "3"],
-    priority: "medium",
-    createdBy: "Art Department",
   },
 ];
 
@@ -156,12 +198,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>(initialDiary);
   const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
+  const [students, setStudents] = useState<Student[]>(defaultStudents);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const found = mockUsers[email];
-    if (found && found.password === password) {
-      const { password: _, ...userData } = found;
+    // Check admin/principal accounts
+    const adminUser = adminUsers[email];
+    if (adminUser && adminUser.password === password) {
+      const { password: _, ...userData } = adminUser;
       setUser(userData);
+      return true;
+    }
+    // Check student accounts
+    const student = students.find((s) => s.email === email && s.password === password);
+    if (student) {
+      setUser({
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        role: "student",
+        class: student.class,
+        rollNumber: student.rollNumber,
+        section: student.section,
+        fatherName: student.fatherName,
+      });
       return true;
     }
     return false;
@@ -177,8 +236,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAnnouncements((prev) => [{ ...entry, id: `a${Date.now()}` }, ...prev]);
   };
 
+  const addStudent = (student: Omit<Student, "id">) => {
+    setStudents((prev) => [...prev, { ...student, id: `s${Date.now()}` }]);
+  };
+
+  const removeStudent = (id: string) => {
+    setStudents((prev) => prev.filter((s) => s.id !== id));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, diaryEntries, announcements, addDiaryEntry, addAnnouncement }}>
+    <AuthContext.Provider
+      value={{
+        user, login, logout, isAuthenticated: !!user,
+        diaryEntries, announcements, addDiaryEntry, addAnnouncement,
+        students, addStudent, removeStudent,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

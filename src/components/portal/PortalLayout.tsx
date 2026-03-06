@@ -18,7 +18,7 @@ const PortalLayout = () => {
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <h2 className="font-display font-bold text-foreground text-lg hidden sm:block">
-                {user?.role === "admin" ? "🛡️ Admin Panel" : `👋 Hi, ${user?.name?.split(" ")[0]}!`}
+                {user?.role === "principal" ? "👑 Principal Panel" : user?.role === "admin" ? "🛡️ Admin Panel" : `👋 Hi, ${user?.name?.split(" ")[0]}!`}
               </h2>
             </div>
             <div className="flex items-center gap-4">
@@ -35,7 +35,7 @@ const PortalLayout = () => {
                 <div className="hidden md:block">
                   <p className="text-sm font-bold font-body text-foreground">{user?.name}</p>
                   <p className="text-xs text-muted-foreground font-body">
-                    {user?.role === "admin" ? "Administrator" : `Class ${user?.class} · ${user?.section || "A"}`}
+                    {user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Administrator" : `Class ${user?.class} · ${user?.section || "A"}`}
                   </p>
                 </div>
               </div>
