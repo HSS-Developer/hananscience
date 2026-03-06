@@ -27,7 +27,7 @@ const PortalLayout = () => {
                 <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl gradient-fun flex items-center justify-center shadow-card">
+              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-card">
                   <span className="text-sm font-bold text-primary-foreground font-body">
                     {user?.name?.charAt(0) || "U"}
                   </span>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GraduationCap, Eye, EyeOff, Lock, Mail, BookOpen, Star, Sparkles } from "lucide-react";
 import schoolHero from "@/assets/school-hero.jpg";
+import schoolLogo from "@/assets/school-logo.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -43,9 +44,7 @@ const Login = () => {
             transition={{ duration: 0.6 }}
             className="flex items-center gap-3"
           >
-            <div className="w-14 h-14 rounded-2xl gradient-warm flex items-center justify-center shadow-fun">
-              <GraduationCap className="w-8 h-8 text-primary-foreground" />
-            </div>
+            <img src={schoolLogo} alt="HSc Kids Logo" className="w-16 h-16 rounded-2xl object-contain bg-white/90 p-1 shadow-fun" />
             <div>
               <h2 className="text-2xl font-display font-bold text-primary-foreground">HANAN</h2>
               <p className="text-sm font-body text-primary-foreground/80 tracking-wider">Science School</p>
@@ -91,9 +90,7 @@ const Login = () => {
         >
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="w-12 h-12 rounded-2xl gradient-fun flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-primary-foreground" />
-            </div>
+            <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-2xl object-contain bg-white/90 p-0.5" />
             <div>
               <h2 className="text-xl font-display font-bold text-foreground">HANAN</h2>
               <p className="text-xs font-body text-muted-foreground tracking-wider">Science School</p>
