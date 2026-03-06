@@ -1,18 +1,14 @@
 import {
   LayoutDashboard,
-  BookOpen,
-  ClipboardCheck,
   Calendar,
   Megaphone,
   User,
   CreditCard,
   FileText,
-  Settings,
   LogOut,
-  GraduationCap,
   BookMarked,
-  ShieldCheck,
   Send,
+  Users,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
@@ -34,8 +30,6 @@ import {
 const studentItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "📓 Diary", url: "/diary", icon: BookMarked },
-  { title: "📊 My Grades", url: "/grades", icon: BookOpen },
-  { title: "✅ Attendance", url: "/attendance", icon: ClipboardCheck },
   { title: "📅 Timetable", url: "/timetable", icon: Calendar },
   { title: "📢 Notices", url: "/announcements", icon: Megaphone },
 ];
@@ -50,6 +44,16 @@ const adminItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
   { title: "📢 Send Notice", url: "/admin/announcement", icon: Megaphone },
+  { title: "👥 Students", url: "/admin/students", icon: Users },
+  { title: "👁 View Diary", url: "/diary", icon: BookMarked },
+  { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+];
+
+const principalItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
+  { title: "📢 Send Notice", url: "/admin/announcement", icon: Megaphone },
+  { title: "👥 Students", url: "/admin/students", icon: Users },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
 ];
@@ -62,18 +66,20 @@ export function AppSidebar() {
   const { logout, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
-  const isAdmin = user?.role === "admin";
-  const mainItems = isAdmin ? adminItems : studentItems;
+  const isAdmin = user?.role === "admin" || user?.role === "principal";
+  const mainItems = user?.role === "principal" ? principalItems : user?.role === "admin" ? adminItems : studentItems;
   const secondItems = isAdmin ? [] : studentSecondary;
+
+  const roleLabel = user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Admin" : `Class ${user?.class} · ${user?.rollNumber}`;
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <div className="p-4 flex items-center gap-3">
-        <img src={schoolLogo} alt="HSc Kids Logo" className="w-11 h-11 rounded-xl flex-shrink-0 object-contain bg-white/90 p-0.5" />
+        <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-xl flex-shrink-0 object-contain bg-white/90 p-0.5" />
         {!collapsed && (
           <div className="min-w-0">
-            <h2 className="font-display font-bold text-sm text-sidebar-foreground leading-tight">HANAN</h2>
-            <p className="text-[10px] text-sidebar-primary tracking-widest uppercase font-body">Science School</p>
+            <h2 className="font-display font-bold text-base text-sidebar-foreground leading-tight">HANAN SCIENCE</h2>
+            <p className="text-[10px] text-sidebar-primary tracking-widest uppercase font-body">(Kids) School</p>
           </div>
         )}
       </div>
@@ -81,7 +87,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider font-body">
-            {isAdmin ? "🛡️ Admin Panel" : "📚 Menu"}
+            {user?.role === "principal" ? "👑 Principal" : isAdmin ? "🛡️ Admin Panel" : "📚 Menu"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -126,9 +132,7 @@ export function AppSidebar() {
         {!collapsed && user && (
           <div className="px-3 py-2 mb-2">
             <p className="text-xs font-body font-bold text-sidebar-foreground truncate">{user.name}</p>
-            <p className="text-[10px] text-sidebar-foreground/60 truncate font-body">
-              {isAdmin ? "Admin" : `Class ${user.class} · ${user.rollNumber}`}
-            </p>
+            <p className="text-[10px] text-sidebar-foreground/60 truncate font-body">{roleLabel}</p>
           </div>
         )}
         <SidebarMenu>

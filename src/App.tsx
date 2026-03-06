@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Grades from "./pages/Grades";
 import Attendance from "./pages/Attendance";
 import Timetable from "./pages/Timetable";
+import AdminStudents from "./pages/AdminStudents";
 import Announcements from "./pages/Announcements";
 import Fees from "./pages/Fees";
 import Assignments from "./pages/Assignments";
@@ -34,8 +35,6 @@ const App = () => (
             <Route element={<PortalLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/diary" element={<Diary />} />
-              <Route path="/grades" element={<Grades />} />
-              <Route path="/attendance" element={<Attendance />} />
               <Route path="/timetable" element={<Timetable />} />
               <Route path="/announcements" element={<Announcements />} />
               <Route path="/fees" element={<Fees />} />
@@ -44,6 +43,7 @@ const App = () => (
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin/diary" element={<AdminSendDiary />} />
               <Route path="/admin/announcement" element={<AdminSendAnnouncement />} />
+              <Route path="/admin/students" element={<AdminStudents />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

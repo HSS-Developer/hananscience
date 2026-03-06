@@ -158,10 +158,10 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="mt-8 p-4 rounded-2xl bg-muted/60 border border-border">
-            <p className="text-xs text-muted-foreground font-body mb-2 font-semibold">🔑 Demo Logins:</p>
-            <p className="text-xs font-body text-foreground"><strong>Student:</strong> student@hanan.edu / student123</p>
-            <p className="text-xs font-body text-foreground"><strong>Admin:</strong> admin@hanan.edu / admin123</p>
+          <div className="mt-6 text-center">
+            <p className="text-xs text-muted-foreground font-body">
+              HANAN SCIENCE (Kids) SCHOOL · PG to Class 8
+            </p>
           </div>
         </motion.div>
       </div>
