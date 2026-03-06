@@ -69,6 +69,7 @@ export default {
         red: "hsl(var(--red))",
         maroon: "hsl(var(--maroon))",
         grey: "hsl(var(--grey))",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
