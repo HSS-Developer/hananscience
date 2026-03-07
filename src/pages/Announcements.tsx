@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth, classDisplayName } from "@/contexts/AuthContext";
-import { Megaphone, Calendar } from "lucide-react";
+import { Megaphone, Calendar, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Announcements = () => {
-  const { user, announcements } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { user, announcements, deleteAnnouncement } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "principal";
 
   const filtered = isAdmin
     ? announcements
@@ -21,7 +22,7 @@ const Announcements = () => {
       </div>
 
       {filtered.length === 0 ? (
-        <Card className="shadow-card rounded-2xl">
+        <Card className="shadow-card rounded-2xl backdrop-blur-sm bg-card/80">
           <CardContent className="p-12 text-center">
             <p className="text-4xl mb-4">📭</p>
             <p className="font-display font-bold text-lg">No Announcements!</p>
@@ -31,12 +32,24 @@ const Announcements = () => {
         <div className="space-y-4">
           {filtered.map((a) => (
             <motion.div key={a.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden">
-                <div className={`h-2 ${a.priority === "high" ? "bg-destructive" : a.priority === "medium" ? "bg-orange" : "bg-green"}`} />
+              <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm bg-card/80">
+                <div className={`h-1.5 ${a.priority === "high" ? "bg-destructive" : a.priority === "medium" ? "bg-orange" : "bg-green"}`} />
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
                     <div className="flex-1">
-                      <h3 className="font-display font-bold text-foreground text-lg">{a.title}</h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-display font-bold text-foreground text-lg">{a.title}</h3>
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl flex-shrink-0"
+                            onClick={() => deleteAnnouncement(a.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground font-body mt-2 leading-relaxed">{a.content}</p>
                       <div className="flex items-center gap-4 mt-3 flex-wrap">
                         <span className="text-xs text-muted-foreground font-body flex items-center gap-1">
