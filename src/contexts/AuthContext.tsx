@@ -62,6 +62,8 @@ interface AuthContextType {
   announcements: Announcement[];
   addDiaryEntry: (entry: Omit<DiaryEntry, "id">) => void;
   addAnnouncement: (entry: Omit<Announcement, "id">) => void;
+  deleteDiaryEntry: (id: string) => void;
+  deleteAnnouncement: (id: string) => void;
   students: Student[];
   addStudent: (student: Omit<Student, "id">) => void;
   removeStudent: (id: string) => void;
@@ -108,7 +110,7 @@ const defaultStudents: Student[] = [
 const adminUsers: Record<string, User & { password: string }> = {
   "admin@hanan.edu": {
     id: "admin-1",
-    name: "Dr. Fatima Khan",
+    name: "Gmd",
     email: "admin@hanan.edu",
     password: "admin123",
     role: "admin",
@@ -117,7 +119,7 @@ const adminUsers: Record<string, User & { password: string }> = {
   },
   "principal@hanan.edu": {
     id: "principal-1",
-    name: "Prof. Abdul Rehman",
+    name: "Miss. Shamila",
     email: "principal@hanan.edu",
     password: "principal123",
     role: "principal",
@@ -138,7 +140,7 @@ const initialDiary: DiaryEntry[] = [
       { subject: "Science", homework: "Draw and label parts of a plant" },
     ],
     note: "Reminder: Bring art supplies tomorrow! 🎨",
-    createdBy: "Dr. Fatima Khan",
+    createdBy: "Gmd",
   },
   {
     id: "d2",
@@ -149,7 +151,7 @@ const initialDiary: DiaryEntry[] = [
       { subject: "Islamiat", homework: "Memorize Surah Al-Fil" },
       { subject: "English", homework: "Write 10 new words with meanings" },
     ],
-    createdBy: "Dr. Fatima Khan",
+    createdBy: "Gmd",
   },
   {
     id: "d3",
@@ -160,7 +162,7 @@ const initialDiary: DiaryEntry[] = [
       { subject: "Math", homework: "Exercise 7.2 all questions" },
     ],
     note: "Science test on Friday!",
-    createdBy: "Dr. Fatima Khan",
+    createdBy: "Gmd",
   },
 ];
 
@@ -172,7 +174,7 @@ const initialAnnouncements: Announcement[] = [
     date: "2026-03-05",
     targetClasses: ALL_CLASSES,
     priority: "high",
-    createdBy: "Principal",
+    createdBy: "Miss. Shamila",
   },
   {
     id: "a2",
@@ -181,7 +183,7 @@ const initialAnnouncements: Announcement[] = [
     date: "2026-03-04",
     targetClasses: ["1", "2", "3", "4", "5", "6", "7", "8"],
     priority: "high",
-    createdBy: "Exam Department",
+    createdBy: "Gmd",
   },
   {
     id: "a3",
@@ -190,7 +192,7 @@ const initialAnnouncements: Announcement[] = [
     date: "2026-03-03",
     targetClasses: ALL_CLASSES,
     priority: "medium",
-    createdBy: "Administration",
+    createdBy: "Gmd",
   },
 ];
 
@@ -236,6 +238,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAnnouncements((prev) => [{ ...entry, id: `a${Date.now()}` }, ...prev]);
   };
 
+  const deleteDiaryEntry = (id: string) => {
+    setDiaryEntries((prev) => prev.filter((d) => d.id !== id));
+  };
+
+  const deleteAnnouncement = (id: string) => {
+    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+  };
+
   const addStudent = (student: Omit<Student, "id">) => {
     setStudents((prev) => [...prev, { ...student, id: `s${Date.now()}` }]);
   };
@@ -249,6 +259,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user, login, logout, isAuthenticated: !!user,
         diaryEntries, announcements, addDiaryEntry, addAnnouncement,
+        deleteDiaryEntry, deleteAnnouncement,
         students, addStudent, removeStudent,
       }}
     >
