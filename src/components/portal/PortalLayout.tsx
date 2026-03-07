@@ -14,7 +14,7 @@ const PortalLayout = () => {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-16 flex items-center justify-between border-b border-border bg-card px-4 lg:px-6 flex-shrink-0">
+          <header className="h-16 flex items-center justify-between border-b border-border/60 bg-card/70 backdrop-blur-md px-4 lg:px-6 flex-shrink-0 sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <h2 className="font-display font-bold text-foreground text-lg hidden sm:block">
@@ -22,12 +22,12 @@ const PortalLayout = () => {
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <button className="relative p-2 rounded-xl hover:bg-muted transition-colors">
+              <button className="relative p-2 rounded-xl hover:bg-muted/60 transition-colors">
                 <Bell className="w-5 h-5 text-muted-foreground" />
                 <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
               </button>
               <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-card">
+                <div className="w-9 h-9 rounded-xl gradient-fun flex items-center justify-center shadow-card">
                   <span className="text-sm font-bold text-primary-foreground font-body">
                     {user?.name?.charAt(0) || "U"}
                   </span>

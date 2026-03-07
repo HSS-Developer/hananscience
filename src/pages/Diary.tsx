@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth, classDisplayName } from "@/contexts/AuthContext";
-import { BookMarked, Calendar } from "lucide-react";
+import { BookMarked, Calendar, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Diary = () => {
-  const { user, diaryEntries } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { user, diaryEntries, deleteDiaryEntry } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "principal";
 
-  // Students see only their class diary. Admin sees all.
   const entries = isAdmin
     ? diaryEntries
     : diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
@@ -22,7 +22,7 @@ const Diary = () => {
       </div>
 
       {entries.length === 0 ? (
-        <Card className="shadow-card border-border/50 rounded-2xl">
+        <Card className="shadow-card border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
           <CardContent className="p-12 text-center">
             <p className="text-4xl mb-4">📭</p>
             <p className="font-display font-bold text-lg text-foreground">No Diary Entries Yet!</p>
@@ -33,26 +33,38 @@ const Diary = () => {
         <div className="space-y-4">
           {entries.map((entry) => (
             <motion.div key={entry.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden">
-                <div className="h-2 gradient-warm" />
+              <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm bg-card/80">
+                <div className="h-1.5 gradient-warm" />
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <CardTitle className="font-display text-lg flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-orange" />
                       {new Date(entry.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                     </CardTitle>
-                    <div className="flex gap-1 flex-wrap">
-                      {entry.targetClasses.map((c) => (
-                        <span key={c} className="text-[10px] font-body font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">
-                          {classDisplayName(c)}
-                        </span>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1 flex-wrap">
+                        {entry.targetClasses.map((c) => (
+                          <span key={c} className="text-[10px] font-body font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">
+                            {classDisplayName(c)}
+                          </span>
+                        ))}
+                      </div>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                          onClick={() => deleteDiaryEntry(entry.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {entry.subjects.map((s, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-muted/40">
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 backdrop-blur-sm">
                       <div className="w-8 h-8 rounded-lg gradient-fun flex items-center justify-center flex-shrink-0">
                         <span className="text-xs font-bold text-primary-foreground font-body">{i + 1}</span>
                       </div>
