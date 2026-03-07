@@ -12,7 +12,7 @@ import Attendance from "./pages/Attendance";
 import Timetable from "./pages/Timetable";
 import AdminStudents from "./pages/AdminStudents";
 import Announcements from "./pages/Announcements";
-import Fees from "./pages/Fees";
+
 import Assignments from "./pages/Assignments";
 import Profile from "./pages/Profile";
 import SettingsPage from "./pages/SettingsPage";
@@ -37,7 +37,7 @@ const App = () => (
               <Route path="/diary" element={<Diary />} />
               <Route path="/timetable" element={<Timetable />} />
               <Route path="/announcements" element={<Announcements />} />
-              <Route path="/fees" element={<Fees />} />
+              
               <Route path="/assignments" element={<Assignments />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<SettingsPage />} />
