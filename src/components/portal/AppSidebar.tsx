@@ -35,7 +35,7 @@ const studentItems = [
 ];
 
 const studentSecondary = [
-  { title: "💰 Fees", url: "/fees", icon: CreditCard },
+  
   { title: "📝 Homework", url: "/assignments", icon: FileText },
   { title: "👤 Profile", url: "/profile", icon: User },
 ];
