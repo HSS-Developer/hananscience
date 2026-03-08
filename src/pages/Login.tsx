@@ -180,7 +180,7 @@ const Login = () => {
 
           <div className="mt-6 text-center">
             <p className="text-xs font-body font-bold text-foreground tracking-wide">
-              We Promise, We Deliver.
+              ✨ We Promise, We Deliver 🚀
             </p>
             <p className="text-[10px] text-muted-foreground font-body mt-1">
               HANAN SCIENCE (Kids) SCHOOL · PG to Class 8
