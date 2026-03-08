@@ -9,6 +9,7 @@ import {
   Send,
   Users,
   Info,
+  GraduationCap,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
