@@ -16,39 +16,36 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
-    // Verify the caller is admin/principal
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user: caller },
-    } = await supabaseAdmin.auth.getUser(token);
-    if (!caller) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Check caller role
-    const { data: callerRole } = await supabaseAdmin.rpc("get_user_role", {
-      _user_id: caller.id,
-    });
-    if (callerRole !== "admin" && callerRole !== "principal") {
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const body = await req.json();
     const { action } = body;
+
+    // Seed action doesn't require caller auth
+    if (action !== "seed") {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user: caller } } = await supabaseAdmin.auth.getUser(token);
+      if (!caller) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: callerRole } = await supabaseAdmin.rpc("get_user_role", { _user_id: caller.id });
+      if (callerRole !== "admin" && callerRole !== "principal") {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     // Seed action doesn't require auth (uses internal secret)
     if (action === "seed") {
