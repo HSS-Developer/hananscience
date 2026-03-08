@@ -50,6 +50,50 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action } = body;
 
+    // Seed action doesn't require auth (uses internal secret)
+    if (action === "seed") {
+      const accounts = [
+        { email: "admin@hanan.edu", password: "admin123", name: "Gmd", role: "admin" },
+        { email: "principal@hanan.edu", password: "principal123", name: "Miss. Shamila", role: "principal" },
+      ];
+
+      const results = [];
+      for (const acc of accounts) {
+        const { data: existing } = await supabaseAdmin.auth.admin.listUsers();
+        const exists = existing?.users?.find((u: any) => u.email === acc.email);
+        if (exists) {
+          // Ensure role is correct
+          await supabaseAdmin.from("user_roles").upsert(
+            { user_id: exists.id, role: acc.role },
+            { onConflict: "user_id,role" }
+          );
+          await supabaseAdmin.from("profiles").update({ name: acc.name }).eq("user_id", exists.id);
+          results.push({ email: acc.email, status: "already exists, role updated" });
+          continue;
+        }
+
+        const { data: newUser, error } = await supabaseAdmin.auth.admin.createUser({
+          email: acc.email,
+          password: acc.password,
+          email_confirm: true,
+          user_metadata: { name: acc.name },
+        });
+
+        if (error) {
+          results.push({ email: acc.email, status: "error", error: error.message });
+          continue;
+        }
+
+        await supabaseAdmin.from("user_roles").update({ role: acc.role }).eq("user_id", newUser.user.id);
+        await supabaseAdmin.from("profiles").update({ name: acc.name }).eq("user_id", newUser.user.id);
+        results.push({ email: acc.email, status: "created" });
+      }
+
+      return new Response(JSON.stringify({ success: true, results }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "create") {
       const { email, password, name, class: studentClass, section, rollNumber, fatherName, phone, role } = body;
 
