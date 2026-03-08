@@ -18,7 +18,7 @@ const PortalLayout = () => {
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <h2 className="font-display font-bold text-foreground text-lg hidden sm:block">
-                {user?.role === "principal" ? "👑 Principal Panel" : user?.role === "admin" ? "🛡️ Admin Panel" : `👋 Hi, ${user?.name?.split(" ")[0]}!`}
+                {user?.role === "principal" ? "👑 Principal Panel" : user?.role === "admin" ? "🛡️ Admin Panel" : user?.role === "teacher" ? "📚 Teacher Panel" : `👋 Hi, ${user?.name?.split(" ")[0]}!`}
               </h2>
             </div>
             <div className="flex items-center gap-4">
