@@ -61,12 +61,12 @@ const Login = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-4"
           >
-            <img src={schoolLogo} alt="HSc Kids Logo" className="w-16 h-16 rounded-2xl object-contain bg-white/90 p-1 shadow-fun" />
+            <img src={schoolLogo} alt="HANAN SCIENCE SCHOOL" className="w-20 h-20 rounded-2xl object-contain bg-primary-foreground/95 p-1.5 shadow-fun" />
             <div>
-              <h2 className="text-2xl font-display font-bold text-primary-foreground">HANAN</h2>
-              <p className="text-sm font-body text-primary-foreground/80 tracking-wider">Science School</p>
+              <h2 className="text-3xl font-display font-bold text-primary-foreground leading-tight">HANAN SCIENCE</h2>
+              <p className="text-base font-display font-medium text-primary-foreground/85 tracking-wide">(Kids) School</p>
             </div>
           </motion.div>
 
@@ -75,12 +75,12 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground leading-tight mb-4">
-              Where Little Minds<br />
-              <span className="text-accent">Grow Big! ✨</span>
+            <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground leading-tight mb-3">
+              We Promise,<br />
+              <span className="text-primary-foreground">We Deliver.</span>
             </h1>
             <p className="text-lg text-primary-foreground/80 font-body max-w-md">
-              PG to Class 8 · A place where learning is fun and every child shines bright! 🌟
+              PG to Class 8 · Quality education with values that last a lifetime.
             </p>
 
             <div className="flex gap-4 mt-8">
@@ -108,11 +108,12 @@ const Login = () => {
           transition={{ duration: 0.6 }}
         >
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-2xl object-contain bg-white/90 p-0.5" />
-            <div>
-              <h2 className="text-xl font-display font-bold text-foreground">HANAN</h2>
-              <p className="text-xs font-body text-muted-foreground tracking-wider">Science School</p>
+          <div className="lg:hidden flex flex-col items-center gap-3 mb-8">
+            <img src={schoolLogo} alt="HANAN SCIENCE SCHOOL" className="w-20 h-20 rounded-2xl object-contain bg-primary-foreground/95 p-1.5 shadow-fun" />
+            <div className="text-center">
+              <h2 className="text-2xl font-display font-bold text-foreground">HANAN SCIENCE</h2>
+              <p className="text-sm font-display font-medium text-muted-foreground tracking-wide">(Kids) School</p>
+              <p className="text-xs font-body font-bold text-foreground mt-1 tracking-wide">We Promise, We Deliver.</p>
             </div>
           </div>
 
@@ -178,7 +179,10 @@ const Login = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-muted-foreground font-body">
+            <p className="text-xs font-body font-bold text-foreground tracking-wide">
+              We Promise, We Deliver.
+            </p>
+            <p className="text-[10px] text-muted-foreground font-body mt-1">
               HANAN SCIENCE (Kids) SCHOOL · PG to Class 8
             </p>
           </div>
