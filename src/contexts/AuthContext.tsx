@@ -323,6 +323,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await fetchStudents();
   };
 
+  const addTeacher = async (teacher: { name: string; email: string; phone?: string; password: string }) => {
+    const { data, error } = await supabase.functions.invoke("manage-users", {
+      body: {
+        action: "create",
+        email: teacher.email,
+        password: teacher.password,
+        name: teacher.name,
+        phone: teacher.phone,
+        role: "teacher",
+      },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    await fetchStudents();
+  };
+
+  const removeTeacher = async (id: string) => {
+    const teacher = teachers.find((t) => t.id === id);
+    if (!teacher) return;
+    await supabase.functions.invoke("manage-users", {
+      body: { action: "delete", userId: teacher.userId },
+    });
+    await fetchStudents();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -338,8 +363,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         deleteDiaryEntry,
         deleteAnnouncement,
         students,
+        teachers,
         addStudent,
+        addTeacher,
         removeStudent,
+        removeTeacher,
         refreshData,
       }}
     >
