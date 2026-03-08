@@ -1,16 +1,27 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth, classDisplayName } from "@/contexts/AuthContext";
-import { BookMarked, Calendar, Trash2 } from "lucide-react";
+import { Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const Diary = () => {
   const { user, diaryEntries, deleteDiaryEntry } = useAuth();
+  const { toast } = useToast();
   const isAdmin = user?.role === "admin" || user?.role === "principal";
 
   const entries = isAdmin
     ? diaryEntries
     : diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDiaryEntry(id);
+      toast({ title: "🗑️ Diary entry deleted" });
+    } catch {
+      toast({ title: "❌ Delete failed", variant: "destructive" });
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -54,7 +65,7 @@ const Diary = () => {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                          onClick={() => deleteDiaryEntry(entry.id)}
+                          onClick={() => handleDelete(entry.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
