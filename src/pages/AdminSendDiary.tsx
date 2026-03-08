@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth, ALL_CLASSES, classDisplayName, type ClassLevel } from "@/contexts/AuthContext";
-import { Send, Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Send, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const AdminSendDiary = () => {
@@ -16,6 +15,7 @@ const AdminSendDiary = () => {
   const [subjects, setSubjects] = useState([{ subject: "", homework: "" }]);
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const toggleClass = (c: ClassLevel) => {
     setSelectedClasses((prev) =>
@@ -33,7 +33,7 @@ const AdminSendDiary = () => {
     setSubjects((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: value } : s)));
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (selectedClasses.length === 0) {
       toast({ title: "⚠️ Select at least one class!", variant: "destructive" });
       return;
@@ -44,33 +44,38 @@ const AdminSendDiary = () => {
       return;
     }
 
-    addDiaryEntry({
-      date: new Date().toISOString().split("T")[0],
-      targetClasses: selectedClasses,
-      subjects: validSubjects,
-      note: note.trim() || undefined,
-      createdBy: user?.name || "Admin",
-    });
+    setSending(true);
+    try {
+      await addDiaryEntry({
+        date: new Date().toISOString().split("T")[0],
+        targetClasses: selectedClasses,
+        subjects: validSubjects,
+        note: note.trim() || undefined,
+        createdBy: user?.name || "Admin",
+      });
 
-    setSent(true);
-    toast({ title: "✅ Diary sent successfully!" });
+      setSent(true);
+      toast({ title: "✅ Diary sent successfully!" });
 
-    setTimeout(() => {
-      setSent(false);
-      setSelectedClasses([]);
-      setSubjects([{ subject: "", homework: "" }]);
-      setNote("");
-    }, 2000);
+      setTimeout(() => {
+        setSent(false);
+        setSelectedClasses([]);
+        setSubjects([{ subject: "", homework: "" }]);
+        setNote("");
+      }, 2000);
+    } catch {
+      toast({ title: "❌ Failed to send diary", variant: "destructive" });
+    }
+    setSending(false);
   };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">📓 Send Diary</h1>
-        <p className="text-muted-foreground font-body">Send homework diary to specific classes. All students in selected classes will receive it.</p>
+        <p className="text-muted-foreground font-body">Send homework diary to specific classes.</p>
       </div>
 
-      {/* Select Classes */}
       <Card className="shadow-card border-border/50 rounded-2xl">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -99,7 +104,6 @@ const AdminSendDiary = () => {
         </CardContent>
       </Card>
 
-      {/* Subjects & Homework */}
       <Card className="shadow-card border-border/50 rounded-2xl">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -123,21 +127,11 @@ const AdminSendDiary = () => {
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
                   <Label className="font-body text-xs font-semibold">Subject Name</Label>
-                  <Input
-                    placeholder="e.g. Math, English, Science..."
-                    value={s.subject}
-                    onChange={(e) => updateSubject(i, "subject", e.target.value)}
-                    className="rounded-xl font-body mt-1"
-                  />
+                  <Input placeholder="e.g. Math, English..." value={s.subject} onChange={(e) => updateSubject(i, "subject", e.target.value)} className="rounded-xl font-body mt-1" />
                 </div>
                 <div>
                   <Label className="font-body text-xs font-semibold">Homework / Task</Label>
-                  <Input
-                    placeholder="e.g. Do exercise 5.3 Q1-Q10"
-                    value={s.homework}
-                    onChange={(e) => updateSubject(i, "homework", e.target.value)}
-                    className="rounded-xl font-body mt-1"
-                  />
+                  <Input placeholder="e.g. Do exercise 5.3" value={s.homework} onChange={(e) => updateSubject(i, "homework", e.target.value)} className="rounded-xl font-body mt-1" />
                 </div>
               </div>
             </div>
@@ -145,40 +139,29 @@ const AdminSendDiary = () => {
         </CardContent>
       </Card>
 
-      {/* Note */}
       <Card className="shadow-card border-border/50 rounded-2xl">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-lg">💡 Additional Note (Optional)</CardTitle>
         </CardHeader>
         <CardContent>
-          <Textarea
-            placeholder="e.g. Bring art supplies tomorrow! Reminder: Test on Friday..."
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="rounded-xl font-body"
-            rows={3}
-          />
+          <Textarea placeholder="e.g. Bring art supplies tomorrow!" value={note} onChange={(e) => setNote(e.target.value)} className="rounded-xl font-body" rows={3} />
         </CardContent>
       </Card>
 
-      {/* Send Button */}
       <Button
         onClick={handleSend}
-        disabled={sent}
+        disabled={sent || sending}
         className={`w-full h-14 text-lg font-display font-bold rounded-2xl shadow-elevated transition-all ${
           sent ? "bg-green text-primary-foreground" : "gradient-warm text-primary-foreground hover:opacity-90"
         }`}
         size="lg"
       >
         {sent ? (
-          <>
-            <CheckCircle2 className="w-6 h-6 mr-2" /> Sent Successfully! ✅
-          </>
+          <><CheckCircle2 className="w-6 h-6 mr-2" /> Sent Successfully! ✅</>
+        ) : sending ? (
+          <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Sending...</>
         ) : (
-          <>
-            <Send className="w-6 h-6 mr-2" /> Send Diary to{" "}
-            {selectedClasses.length > 0 ? `${selectedClasses.length} Class(es)` : "Selected Classes"} 📓
-          </>
+          <><Send className="w-6 h-6 mr-2" /> Send Diary to {selectedClasses.length > 0 ? `${selectedClasses.length} Class(es)` : "Selected Classes"} 📓</>
         )}
       </Button>
     </motion.div>
