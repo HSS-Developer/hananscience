@@ -26,8 +26,8 @@ const AboutUs = () => {
               <h2 className="text-2xl lg:text-3xl font-display font-bold text-primary-foreground/90 mt-1">
                 (Kids) SCHOOL
               </h2>
-              <p className="text-primary-foreground/80 font-body text-lg mt-3">
-                Where Little Minds Grow Big! ✨
+              <p className="text-primary-foreground/90 font-body text-lg font-bold mt-3 tracking-wide">
+                We Promise, We Deliver.
               </p>
               <p className="text-primary-foreground/60 font-body text-sm mt-1">
                 Established for Excellence in Education · PG to Class 8
