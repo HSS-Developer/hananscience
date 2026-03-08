@@ -1,16 +1,27 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth, classDisplayName } from "@/contexts/AuthContext";
-import { Megaphone, Calendar, Trash2 } from "lucide-react";
+import { Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const Announcements = () => {
   const { user, announcements, deleteAnnouncement } = useAuth();
+  const { toast } = useToast();
   const isAdmin = user?.role === "admin" || user?.role === "principal";
 
   const filtered = isAdmin
     ? announcements
     : announcements.filter((a) => user && a.targetClasses.includes(user.class));
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteAnnouncement(id);
+      toast({ title: "🗑️ Announcement deleted" });
+    } catch {
+      toast({ title: "❌ Delete failed", variant: "destructive" });
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -44,7 +55,7 @@ const Announcements = () => {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl flex-shrink-0"
-                            onClick={() => deleteAnnouncement(a.id)}
+                            onClick={() => handleDelete(a.id)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

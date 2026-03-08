@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Trash2, Users, Search } from "lucide-react";
+import { UserPlus, Trash2, Users, Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
@@ -18,6 +18,7 @@ const AdminStudents = () => {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [filterClass, setFilterClass] = useState<string>("all");
+  const [saving, setSaving] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,20 +29,30 @@ const AdminStudents = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("student123");
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!name || !email || !rollNumber || !fatherName) {
       toast({ title: "❌ Sab fields fill karo!", variant: "destructive" });
       return;
     }
-    addStudent({ name, email, class: studentClass, section, rollNumber, fatherName, phone, password });
-    toast({ title: "✅ Student add ho gaya!" });
-    setName(""); setEmail(""); setRollNumber(""); setFatherName(""); setPhone("");
-    setShowForm(false);
+    setSaving(true);
+    try {
+      await addStudent({ name, email, class: studentClass, section, rollNumber, fatherName, phone, password });
+      toast({ title: "✅ Student add ho gaya!" });
+      setName(""); setEmail(""); setRollNumber(""); setFatherName(""); setPhone("");
+      setShowForm(false);
+    } catch (err: any) {
+      toast({ title: "❌ Error: " + (err?.message || "Failed"), variant: "destructive" });
+    }
+    setSaving(false);
   };
 
-  const handleDelete = (id: string, studentName: string) => {
-    removeStudent(id);
-    toast({ title: `🗑️ ${studentName} remove ho gaya` });
+  const handleDelete = async (id: string, studentName: string) => {
+    try {
+      await removeStudent(id);
+      toast({ title: `🗑️ ${studentName} remove ho gaya` });
+    } catch {
+      toast({ title: "❌ Delete failed", variant: "destructive" });
+    }
   };
 
   const filtered = students.filter((s) => {
@@ -116,7 +127,9 @@ const AdminStudents = () => {
                 <Input value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl font-body" />
               </div>
               <div className="sm:col-span-2 flex gap-3">
-                <Button onClick={handleAdd} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold">✅ Save Student</Button>
+                <Button onClick={handleAdd} disabled={saving} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold">
+                  {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : "✅ Save Student"}
+                </Button>
                 <Button variant="outline" onClick={() => setShowForm(false)} className="rounded-xl font-body">Cancel</Button>
               </div>
             </CardContent>

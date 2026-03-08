@@ -12,16 +12,15 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const isAdmin = user?.role === "admin" || user?.role === "principal";
 
-  // Filter diary/announcements for student's class
+  const today = new Date().toISOString().split("T")[0];
   const myDiary = diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
-  // removed unused variable
   const studentAnnouncements = isAdmin ? announcements : announcements.filter((a) => user && a.targetClasses.includes(user.class));
-  const todayDiary = myDiary.find((d) => d.date === "2026-03-05");
+  const todayDiary = myDiary.find((d) => d.date === today);
 
   const stats = isAdmin
     ? [
         { label: "Total Classes", value: "11", emoji: "🏫", color: "gradient-fun" },
-        { label: "Diary Sent Today", value: diaryEntries.filter((d) => d.date === "2026-03-05").length.toString(), emoji: "📓", color: "gradient-warm" },
+        { label: "Diary Sent Today", value: diaryEntries.filter((d) => d.date === today).length.toString(), emoji: "📓", color: "gradient-warm" },
         { label: "Active Notices", value: announcements.length.toString(), emoji: "📢", color: "gradient-fresh" },
         { label: "School Level", value: "PG - 8", emoji: "🎓", color: "gradient-sunset" },
       ]
@@ -34,7 +33,6 @@ const Dashboard = () => {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
-      {/* Welcome */}
       <motion.div variants={item}>
         <div className="p-6 rounded-2xl gradient-fun shadow-elevated">
           <h1 className="text-2xl lg:text-3xl font-display font-bold text-primary-foreground">
@@ -48,7 +46,6 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
-      {/* Stats */}
       <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="shadow-card border-border/50 hover:shadow-elevated transition-shadow rounded-2xl overflow-hidden">
@@ -61,13 +58,9 @@ const Dashboard = () => {
         ))}
       </motion.div>
 
-      {/* Admin Quick Actions */}
       {isAdmin && (
         <motion.div variants={item} className="grid sm:grid-cols-2 gap-4">
-          <Card
-            className="shadow-card border-border/50 rounded-2xl cursor-pointer hover:shadow-elevated transition-all hover:scale-[1.02]"
-            onClick={() => navigate("/admin/diary")}
-          >
+          <Card className="shadow-card border-border/50 rounded-2xl cursor-pointer hover:shadow-elevated transition-all hover:scale-[1.02]" onClick={() => navigate("/admin/diary")}>
             <CardContent className="p-6 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl gradient-warm flex items-center justify-center shadow-fun">
                 <BookMarked className="w-7 h-7 text-primary-foreground" />
@@ -78,10 +71,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-          <Card
-            className="shadow-card border-border/50 rounded-2xl cursor-pointer hover:shadow-elevated transition-all hover:scale-[1.02]"
-            onClick={() => navigate("/admin/announcement")}
-          >
+          <Card className="shadow-card border-border/50 rounded-2xl cursor-pointer hover:shadow-elevated transition-all hover:scale-[1.02]" onClick={() => navigate("/admin/announcement")}>
             <CardContent className="p-6 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl gradient-sunset flex items-center justify-center shadow-fun">
                 <Megaphone className="w-7 h-7 text-primary-foreground" />
@@ -96,14 +86,11 @@ const Dashboard = () => {
       )}
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Today's Diary */}
         {!isAdmin && (
           <motion.div variants={item}>
             <Card className="shadow-card border-border/50 rounded-2xl">
               <CardHeader className="pb-3">
-                <CardTitle className="font-display text-lg flex items-center gap-2">
-                  📓 Today's Diary
-                </CardTitle>
+                <CardTitle className="font-display text-lg flex items-center gap-2">📓 Today's Diary</CardTitle>
               </CardHeader>
               <CardContent>
                 {todayDiary ? (
@@ -131,28 +118,27 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Announcements */}
         <motion.div variants={item}>
           <Card className="shadow-card border-border/50 rounded-2xl">
             <CardHeader className="pb-3">
-              <CardTitle className="font-display text-lg flex items-center gap-2">
-                📢 Latest Notices
-              </CardTitle>
+              <CardTitle className="font-display text-lg flex items-center gap-2">📢 Latest Notices</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {studentAnnouncements.slice(0, 4).map((a) => (
-                <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl bg-muted/40">
-                  <div
-                    className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+              {studentAnnouncements.length === 0 ? (
+                <p className="text-center text-muted-foreground font-body py-6">No notices yet</p>
+              ) : (
+                studentAnnouncements.slice(0, 4).map((a) => (
+                  <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl bg-muted/40">
+                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
                       a.priority === "high" ? "bg-destructive" : a.priority === "medium" ? "bg-orange" : "bg-green"
-                    }`}
-                  />
-                  <div>
-                    <p className="font-body font-bold text-sm text-foreground">{a.title}</p>
-                    <p className="text-xs text-muted-foreground font-body mt-0.5">{a.date}</p>
+                    }`} />
+                    <div>
+                      <p className="font-body font-bold text-sm text-foreground">{a.title}</p>
+                      <p className="text-xs text-muted-foreground font-body mt-0.5">{a.date}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
         </motion.div>
