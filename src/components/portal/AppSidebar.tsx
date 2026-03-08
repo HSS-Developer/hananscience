@@ -9,6 +9,7 @@ import {
   Send,
   Users,
   Info,
+  GraduationCap,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
@@ -40,11 +41,21 @@ const studentSecondary = [
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
+const teacherItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
+  { title: "👁 View Diary", url: "/diary", icon: BookMarked },
+  { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "👥 View Students", url: "/admin/students", icon: Users },
+  { title: "ℹ️ About Us", url: "/about", icon: Info },
+];
+
 const adminItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
   { title: "📢 Send Notice", url: "/admin/announcement", icon: Megaphone },
   { title: "👥 Students", url: "/admin/students", icon: Users },
+  { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
@@ -55,6 +66,7 @@ const principalItems = [
   { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
   { title: "📢 Send Notice", url: "/admin/announcement", icon: Megaphone },
   { title: "👥 Students", url: "/admin/students", icon: Users },
+  { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
@@ -69,15 +81,15 @@ export function AppSidebar() {
 
   const isActive = (path: string) => location.pathname === path;
   const isAdmin = user?.role === "admin" || user?.role === "principal";
-  const mainItems = user?.role === "principal" ? principalItems : user?.role === "admin" ? adminItems : studentItems;
-  const secondItems = isAdmin ? [] : studentSecondary;
+  const mainItems = user?.role === "principal" ? principalItems : user?.role === "admin" ? adminItems : user?.role === "teacher" ? teacherItems : studentItems;
+  const secondItems = isAdmin || user?.role === "teacher" ? [] : studentSecondary;
 
-  const roleLabel = user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Admin" : `Class ${user?.class} · ${user?.rollNumber}`;
+  const roleLabel = user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Admin" : user?.role === "teacher" ? "Teacher" : `Class ${user?.class} · ${user?.rollNumber}`;
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <div className="p-4 flex items-center gap-3">
-        <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-xl flex-shrink-0 object-contain bg-white/90 p-0.5 shadow-fun" />
+        <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-xl flex-shrink-0 object-contain bg-primary-foreground/90 p-0.5 shadow-fun" />
         {!collapsed && (
           <div className="min-w-0">
             <h2 className="font-display font-bold text-base text-sidebar-foreground leading-tight">HANAN SCIENCE</h2>
@@ -89,7 +101,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider font-body">
-            {user?.role === "principal" ? "👑 Principal" : isAdmin ? "🛡️ Admin Panel" : "📚 Menu"}
+            {user?.role === "principal" ? "👑 Principal" : user?.role === "admin" ? "🛡️ Admin Panel" : user?.role === "teacher" ? "📚 Teacher Panel" : "📚 Menu"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

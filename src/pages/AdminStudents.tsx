@@ -13,7 +13,8 @@ const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } 
 const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
 const AdminStudents = () => {
-  const { students, addStudent, removeStudent } = useAuth();
+  const { students, addStudent, removeStudent, user } = useAuth();
+  const isTeacher = user?.role === "teacher";
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
@@ -68,9 +69,11 @@ const AdminStudents = () => {
           <h1 className="text-2xl font-display font-bold text-foreground">👥 Students Management</h1>
           <p className="text-muted-foreground font-body text-sm">Total: {students.length} students</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
-          <UserPlus className="w-4 h-4 mr-2" /> Add Student
-        </Button>
+        {!isTeacher && (
+          <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
+            <UserPlus className="w-4 h-4 mr-2" /> Add Student
+          </Button>
+        )}
       </motion.div>
 
       {showForm && (
@@ -184,14 +187,16 @@ const AdminStudents = () => {
                     <p className="text-xs text-muted-foreground font-body">Father: {student.fatherName}</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(student.id, student.name)}
-                  className="text-destructive hover:bg-destructive/10 rounded-xl"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                {!isTeacher && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(student.id, student.name)}
+                    className="text-destructive hover:bg-destructive/10 rounded-xl"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,100 +6,100 @@
 
 @layer base {
   :root {
-    --background: 30 30% 96%;
-    --foreground: 345 30% 14%;
+    --background: 220 20% 97%;
+    --foreground: 220 25% 10%;
 
-    --card: 30 25% 99%;
-    --card-foreground: 345 30% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
 
-    --popover: 30 20% 98%;
-    --popover-foreground: 345 30% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
 
-    --primary: 345 65% 30%;
-    --primary-foreground: 30 30% 97%;
+    --primary: 220 70% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 30% 60%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 40% 92%;
+    --secondary-foreground: 220 25% 20%;
 
-    --muted: 30 15% 92%;
-    --muted-foreground: 345 10% 44%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 340 40% 52%;
+    --accent: 200 65% 48%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 86%;
-    --ring: 345 55% 34%;
+    --border: 220 13% 90%;
+    --input: 220 13% 88%;
+    --ring: 220 70% 45%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 345 55% 14%;
-    --sidebar-foreground: 30 15% 95%;
-    --sidebar-primary: 340 40% 72%;
-    --sidebar-primary-foreground: 345 55% 14%;
-    --sidebar-accent: 345 45% 20%;
-    --sidebar-accent-foreground: 30 15% 95%;
-    --sidebar-border: 345 40% 18%;
-    --sidebar-ring: 340 40% 72%;
+    --sidebar-background: 220 25% 10%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 200 65% 58%;
+    --sidebar-primary-foreground: 220 25% 10%;
+    --sidebar-accent: 220 20% 16%;
+    --sidebar-accent-foreground: 220 10% 92%;
+    --sidebar-border: 220 18% 14%;
+    --sidebar-ring: 200 65% 58%;
 
     /* Custom tokens */
-    --sky: 210 45% 54%;
-    --green: 152 44% 42%;
-    --orange: 25 75% 54%;
-    --pink: 340 50% 65%;
-    --purple: 270 38% 52%;
-    --yellow: 42 80% 54%;
-    --teal: 180 38% 42%;
-    --red: 0 58% 52%;
-    --maroon: 345 65% 30%;
-    --grey: 340 6% 56%;
+    --sky: 200 65% 48%;
+    --green: 152 55% 42%;
+    --orange: 25 85% 55%;
+    --pink: 340 60% 60%;
+    --purple: 260 50% 55%;
+    --yellow: 42 90% 55%;
+    --teal: 175 50% 40%;
+    --red: 0 65% 50%;
+    --maroon: 220 70% 45%;
+    --grey: 220 8% 52%;
 
-    --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Nunito', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
 
-    --gradient-fun: linear-gradient(135deg, hsl(345 65% 30%), hsl(345 50% 40%));
-    --gradient-warm: linear-gradient(135deg, hsl(25 75% 54%), hsl(35 80% 58%));
-    --gradient-fresh: linear-gradient(135deg, hsl(152 44% 42%), hsl(170 38% 44%));
-    --gradient-sunset: linear-gradient(135deg, hsl(345 50% 48%), hsl(25 75% 54%));
-    --gradient-sky: linear-gradient(135deg, hsl(210 45% 54%), hsl(210 50% 62%));
-    --gradient-cream: linear-gradient(135deg, hsl(30 30% 96%), hsl(30 20% 92%));
-    --shadow-card: 0 4px 20px -4px hsl(345 30% 50% / 0.06), 0 1px 3px hsl(345 30% 50% / 0.04);
-    --shadow-elevated: 0 12px 40px -8px hsl(345 30% 50% / 0.1), 0 4px 12px hsl(345 30% 50% / 0.05);
-    --shadow-fun: 0 8px 25px -5px hsl(345 40% 50% / 0.1);
-    --shadow-glow: 0 0 20px hsl(345 50% 50% / 0.08);
+    --gradient-fun: linear-gradient(135deg, hsl(220 70% 45%), hsl(200 65% 48%));
+    --gradient-warm: linear-gradient(135deg, hsl(25 85% 55%), hsl(35 90% 58%));
+    --gradient-fresh: linear-gradient(135deg, hsl(152 55% 42%), hsl(170 48% 44%));
+    --gradient-sunset: linear-gradient(135deg, hsl(340 60% 55%), hsl(25 85% 55%));
+    --gradient-sky: linear-gradient(135deg, hsl(200 65% 48%), hsl(210 55% 58%));
+    --gradient-cream: linear-gradient(135deg, hsl(220 20% 97%), hsl(220 14% 94%));
+    --shadow-card: 0 1px 3px hsl(220 25% 10% / 0.05), 0 1px 2px hsl(220 25% 10% / 0.04);
+    --shadow-elevated: 0 10px 30px -8px hsl(220 25% 10% / 0.1), 0 4px 10px hsl(220 25% 10% / 0.04);
+    --shadow-fun: 0 6px 20px -4px hsl(220 70% 45% / 0.15);
+    --shadow-glow: 0 0 20px hsl(220 70% 45% / 0.08);
   }
 
   .dark {
-    --background: 345 20% 6%;
-    --foreground: 30 15% 92%;
-    --card: 345 18% 10%;
-    --card-foreground: 30 15% 92%;
-    --popover: 345 18% 10%;
-    --popover-foreground: 30 15% 92%;
-    --primary: 345 50% 48%;
+    --background: 220 20% 7%;
+    --foreground: 220 10% 92%;
+    --card: 220 18% 11%;
+    --card-foreground: 220 10% 92%;
+    --popover: 220 18% 11%;
+    --popover-foreground: 220 10% 92%;
+    --primary: 210 65% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 340 35% 55%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 345 12% 15%;
-    --muted-foreground: 345 6% 55%;
-    --accent: 340 35% 42%;
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 10% 85%;
+    --muted: 220 12% 15%;
+    --muted-foreground: 220 8% 55%;
+    --accent: 200 60% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 340 10% 95%;
-    --border: 345 12% 16%;
-    --input: 345 12% 16%;
-    --ring: 345 50% 48%;
-    --sidebar-background: 345 45% 7%;
-    --sidebar-foreground: 340 8% 90%;
-    --sidebar-primary: 340 35% 68%;
-    --sidebar-primary-foreground: 345 45% 7%;
-    --sidebar-accent: 345 30% 13%;
-    --sidebar-accent-foreground: 340 10% 92%;
-    --sidebar-border: 345 25% 10%;
-    --sidebar-ring: 340 35% 68%;
+    --border: 220 12% 16%;
+    --input: 220 12% 16%;
+    --ring: 210 65% 55%;
+    --sidebar-background: 220 22% 6%;
+    --sidebar-foreground: 220 8% 90%;
+    --sidebar-primary: 200 60% 58%;
+    --sidebar-primary-foreground: 220 22% 6%;
+    --sidebar-accent: 220 18% 12%;
+    --sidebar-accent-foreground: 220 8% 92%;
+    --sidebar-border: 220 18% 10%;
+    --sidebar-ring: 200 60% 58%;
   }
 }
 

@@ -11,7 +11,7 @@ export const classDisplayName = (c: ClassLevel) => {
   return `Class ${c}`;
 };
 
-export type UserRole = "student" | "admin" | "principal";
+export type UserRole = "student" | "admin" | "principal" | "teacher";
 
 export interface DiaryEntry {
   id: string;
@@ -68,8 +68,11 @@ interface AuthContextType {
   deleteDiaryEntry: (id: string) => Promise<void>;
   deleteAnnouncement: (id: string) => Promise<void>;
   students: Student[];
+  teachers: Student[];
   addStudent: (student: { name: string; email: string; class: ClassLevel; section: string; rollNumber: string; fatherName: string; phone?: string; password: string }) => Promise<void>;
+  addTeacher: (teacher: { name: string; email: string; phone?: string; password: string }) => Promise<void>;
   removeStudent: (id: string) => Promise<void>;
+  removeTeacher: (id: string) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 
@@ -81,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
-
+  const [teachers, setTeachers] = useState<Student[]>([]);
   const fetchUserProfile = useCallback(async (supabaseUser: SupabaseUser) => {
     // Get profile
     const { data: profile } = await supabase
@@ -162,36 +165,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchStudents = useCallback(async () => {
-    // Get all student profiles (admins can see all via RLS)
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*");
+    const { data: profiles } = await supabase.from("profiles").select("*");
+    const { data: roles } = await supabase.from("user_roles").select("*");
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("*");
+    if (!profiles || !roles) { setStudents([]); setTeachers([]); return; }
 
-    if (!profiles || !roles) { setStudents([]); return; }
+    const mapProfile = (p: any) => ({
+      id: p.id,
+      userId: p.user_id,
+      name: p.name,
+      email: p.email,
+      class: (p.class as ClassLevel) || "PG",
+      section: p.section || "A",
+      rollNumber: p.roll_number || "",
+      fatherName: p.father_name || "",
+      phone: p.phone || undefined,
+    });
 
-    const studentUserIds = roles
-      .filter((r) => r.role === "student")
-      .map((r) => r.user_id);
+    const studentUserIds = roles.filter((r) => r.role === "student").map((r) => r.user_id);
+    setStudents(profiles.filter((p) => studentUserIds.includes(p.user_id)).map(mapProfile));
 
-    const studentList = profiles
-      .filter((p) => studentUserIds.includes(p.user_id))
-      .map((p) => ({
-        id: p.id,
-        userId: p.user_id,
-        name: p.name,
-        email: p.email,
-        class: (p.class as ClassLevel) || "PG",
-        section: p.section || "A",
-        rollNumber: p.roll_number || "",
-        fatherName: p.father_name || "",
-        phone: p.phone || undefined,
-      }));
-
-    setStudents(studentList);
+    const teacherUserIds = roles.filter((r) => r.role === "teacher").map((r) => r.user_id);
+    setTeachers(profiles.filter((p) => teacherUserIds.includes(p.user_id)).map(mapProfile));
   }, []);
 
   const refreshData = useCallback(async () => {
@@ -211,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setDiaryEntries([]);
           setAnnouncements([]);
           setStudents([]);
+          setTeachers([]);
         }
         setLoading(false);
       }
@@ -327,6 +323,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await fetchStudents();
   };
 
+  const addTeacher = async (teacher: { name: string; email: string; phone?: string; password: string }) => {
+    const { data, error } = await supabase.functions.invoke("manage-users", {
+      body: {
+        action: "create",
+        email: teacher.email,
+        password: teacher.password,
+        name: teacher.name,
+        phone: teacher.phone,
+        role: "teacher",
+      },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    await fetchStudents();
+  };
+
+  const removeTeacher = async (id: string) => {
+    const teacher = teachers.find((t) => t.id === id);
+    if (!teacher) return;
+    await supabase.functions.invoke("manage-users", {
+      body: { action: "delete", userId: teacher.userId },
+    });
+    await fetchStudents();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -342,8 +363,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         deleteDiaryEntry,
         deleteAnnouncement,
         students,
+        teachers,
         addStudent,
+        addTeacher,
         removeStudent,
+        removeTeacher,
         refreshData,
       }}
     >

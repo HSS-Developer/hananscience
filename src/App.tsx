@@ -11,6 +11,7 @@ import Grades from "./pages/Grades";
 import Attendance from "./pages/Attendance";
 import Timetable from "./pages/Timetable";
 import AdminStudents from "./pages/AdminStudents";
+import AdminTeachers from "./pages/AdminTeachers";
 import Announcements from "./pages/Announcements";
 import Assignments from "./pages/Assignments";
 import Profile from "./pages/Profile";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/admin/diary" element={<AdminSendDiary />} />
               <Route path="/admin/announcement" element={<AdminSendAnnouncement />} />
               <Route path="/admin/students" element={<AdminStudents />} />
+              <Route path="/admin/teachers" element={<AdminTeachers />} />
               <Route path="/about" element={<AboutUs />} />
             </Route>
             <Route path="*" element={<NotFound />} />

@@ -94,6 +94,10 @@ Deno.serve(async (req) => {
     if (action === "create") {
       const { email, password, name, class: studentClass, section, rollNumber, fatherName, phone, role } = body;
 
+      // Only admin/principal can create teachers
+      const validRoles = ["student", "teacher"];
+      const targetRole = validRoles.includes(role) ? role : "student";
+
       // Create auth user
       const { data: newUser, error: createError } =
         await supabaseAdmin.auth.admin.createUser({
@@ -115,8 +119,8 @@ Deno.serve(async (req) => {
         .from("profiles")
         .update({
           name,
-          class: studentClass || "PG",
-          section: section || "A",
+          class: studentClass || null,
+          section: section || null,
           roll_number: rollNumber || null,
           father_name: fatherName || null,
           phone: phone || null,
@@ -124,10 +128,10 @@ Deno.serve(async (req) => {
         .eq("user_id", newUser.user.id);
 
       // Update role if not student
-      if (role && role !== "student") {
+      if (targetRole !== "student") {
         await supabaseAdmin
           .from("user_roles")
-          .update({ role })
+          .update({ role: targetRole })
           .eq("user_id", newUser.user.id);
       }
 
