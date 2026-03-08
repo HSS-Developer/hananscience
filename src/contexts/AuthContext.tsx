@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 
 export type ClassLevel = "PG" | "Nursery" | "KG" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8";
 
@@ -32,6 +34,7 @@ export interface Announcement {
 
 export interface Student {
   id: string;
+  userId: string;
   name: string;
   email: string;
   class: ClassLevel;
@@ -39,7 +42,6 @@ export interface Student {
   rollNumber: string;
   fatherName: string;
   phone?: string;
-  password: string;
 }
 
 interface User {
@@ -58,209 +60,291 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
   diaryEntries: DiaryEntry[];
   announcements: Announcement[];
-  addDiaryEntry: (entry: Omit<DiaryEntry, "id">) => void;
-  addAnnouncement: (entry: Omit<Announcement, "id">) => void;
-  deleteDiaryEntry: (id: string) => void;
-  deleteAnnouncement: (id: string) => void;
+  addDiaryEntry: (entry: Omit<DiaryEntry, "id">) => Promise<void>;
+  addAnnouncement: (entry: Omit<Announcement, "id">) => Promise<void>;
+  deleteDiaryEntry: (id: string) => Promise<void>;
+  deleteAnnouncement: (id: string) => Promise<void>;
   students: Student[];
-  addStudent: (student: Omit<Student, "id">) => void;
-  removeStudent: (id: string) => void;
+  addStudent: (student: { name: string; email: string; class: ClassLevel; section: string; rollNumber: string; fatherName: string; phone?: string; password: string }) => Promise<void>;
+  removeStudent: (id: string) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const defaultStudents: Student[] = [
-  {
-    id: "1",
-    name: "Ahmed Hassan",
-    email: "ahmed@hanan.edu",
-    class: "3",
-    section: "A",
-    rollNumber: "HSS-2026-0042",
-    fatherName: "Mr. Hassan Ahmed",
-    phone: "03001234567",
-    password: "student123",
-  },
-  {
-    id: "2",
-    name: "Ayesha Siddiqui",
-    email: "ayesha@hanan.edu",
-    class: "5",
-    section: "A",
-    rollNumber: "HSS-2026-0078",
-    fatherName: "Mr. Siddiqui Ali",
-    phone: "03009876543",
-    password: "student123",
-  },
-  {
-    id: "3",
-    name: "Muhammad Ali",
-    email: "ali@hanan.edu",
-    class: "1",
-    section: "B",
-    rollNumber: "HSS-2026-0015",
-    fatherName: "Mr. Ali Khan",
-    phone: "03211234567",
-    password: "student123",
-  },
-];
-
-const adminUsers: Record<string, User & { password: string }> = {
-  "admin@hanan.edu": {
-    id: "admin-1",
-    name: "Gmd",
-    email: "admin@hanan.edu",
-    password: "admin123",
-    role: "admin",
-    class: "PG",
-    rollNumber: "ADM-001",
-  },
-  "principal@hanan.edu": {
-    id: "principal-1",
-    name: "Miss. Shamila",
-    email: "principal@hanan.edu",
-    password: "principal123",
-    role: "principal",
-    class: "PG",
-    rollNumber: "PRI-001",
-  },
-};
-
-const initialDiary: DiaryEntry[] = [
-  {
-    id: "d1",
-    date: "2026-03-05",
-    targetClasses: ["3"],
-    subjects: [
-      { subject: "English", homework: "Learn page 45 poem by heart" },
-      { subject: "Math", homework: "Do exercise 5.3 (Q1-Q10)" },
-      { subject: "Urdu", homework: "Write 5 sentences about your family" },
-      { subject: "Science", homework: "Draw and label parts of a plant" },
-    ],
-    note: "Reminder: Bring art supplies tomorrow! 🎨",
-    createdBy: "Gmd",
-  },
-  {
-    id: "d2",
-    date: "2026-03-04",
-    targetClasses: ["3"],
-    subjects: [
-      { subject: "Math", homework: "Learn tables 6 to 9" },
-      { subject: "Islamiat", homework: "Memorize Surah Al-Fil" },
-      { subject: "English", homework: "Write 10 new words with meanings" },
-    ],
-    createdBy: "Gmd",
-  },
-  {
-    id: "d3",
-    date: "2026-03-05",
-    targetClasses: ["5", "6", "7", "8"],
-    subjects: [
-      { subject: "Science", homework: "Complete chapter 8 worksheet" },
-      { subject: "Math", homework: "Exercise 7.2 all questions" },
-    ],
-    note: "Science test on Friday!",
-    createdBy: "Gmd",
-  },
-];
-
-const initialAnnouncements: Announcement[] = [
-  {
-    id: "a1",
-    title: "🎉 Annual Sports Day!",
-    content: "Sports Day will be held on March 20th. All students must wear white PT uniform.",
-    date: "2026-03-05",
-    targetClasses: ALL_CLASSES,
-    priority: "high",
-    createdBy: "Miss. Shamila",
-  },
-  {
-    id: "a2",
-    title: "📝 Mid-Term Exams Schedule",
-    content: "Mid-term exams will start from March 25th. Date sheet has been sent.",
-    date: "2026-03-04",
-    targetClasses: ["1", "2", "3", "4", "5", "6", "7", "8"],
-    priority: "high",
-    createdBy: "Gmd",
-  },
-  {
-    id: "a3",
-    title: "🧥 Summer Uniform Change",
-    content: "From March 15th, students should switch to summer uniform.",
-    date: "2026-03-03",
-    targetClasses: ALL_CLASSES,
-    priority: "medium",
-    createdBy: "Gmd",
-  },
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>(initialDiary);
-  const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
-  const [students, setStudents] = useState<Student[]>(defaultStudents);
+  const [loading, setLoading] = useState(true);
+  const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+
+  const fetchUserProfile = useCallback(async (supabaseUser: SupabaseUser) => {
+    // Get profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", supabaseUser.id)
+      .single();
+
+    // Get role
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", supabaseUser.id)
+      .single();
+
+    if (profile) {
+      setUser({
+        id: supabaseUser.id,
+        name: profile.name,
+        email: profile.email,
+        role: (roleData?.role as UserRole) || "student",
+        class: (profile.class as ClassLevel) || "PG",
+        rollNumber: profile.roll_number || "",
+        section: profile.section || "A",
+        fatherName: profile.father_name || undefined,
+      });
+    }
+  }, []);
+
+  const fetchDiaryEntries = useCallback(async () => {
+    const { data: entries } = await supabase
+      .from("diary_entries")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!entries) { setDiaryEntries([]); return; }
+
+    // Fetch subjects for all entries
+    const entryIds = entries.map((e) => e.id);
+    const { data: subjects } = await supabase
+      .from("diary_subjects")
+      .select("*")
+      .in("diary_entry_id", entryIds.length > 0 ? entryIds : ["__none__"]);
+
+    const diaryList: DiaryEntry[] = entries.map((e) => ({
+      id: e.id,
+      date: e.date,
+      targetClasses: e.target_classes as ClassLevel[],
+      subjects: (subjects || [])
+        .filter((s) => s.diary_entry_id === e.id)
+        .map((s) => ({ subject: s.subject, homework: s.homework })),
+      note: e.note || undefined,
+      createdBy: e.created_by,
+    }));
+
+    setDiaryEntries(diaryList);
+  }, []);
+
+  const fetchAnnouncements = useCallback(async () => {
+    const { data } = await supabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!data) { setAnnouncements([]); return; }
+
+    setAnnouncements(
+      data.map((a) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        date: a.date,
+        targetClasses: a.target_classes as ClassLevel[],
+        priority: a.priority as "high" | "medium" | "low",
+        createdBy: a.created_by,
+      }))
+    );
+  }, []);
+
+  const fetchStudents = useCallback(async () => {
+    // Get all student profiles (admins can see all via RLS)
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("*");
+
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("*");
+
+    if (!profiles || !roles) { setStudents([]); return; }
+
+    const studentUserIds = roles
+      .filter((r) => r.role === "student")
+      .map((r) => r.user_id);
+
+    const studentList = profiles
+      .filter((p) => studentUserIds.includes(p.user_id))
+      .map((p) => ({
+        id: p.id,
+        userId: p.user_id,
+        name: p.name,
+        email: p.email,
+        class: (p.class as ClassLevel) || "PG",
+        section: p.section || "A",
+        rollNumber: p.roll_number || "",
+        fatherName: p.father_name || "",
+        phone: p.phone || undefined,
+      }));
+
+    setStudents(studentList);
+  }, []);
+
+  const refreshData = useCallback(async () => {
+    await Promise.all([fetchDiaryEntries(), fetchAnnouncements(), fetchStudents()]);
+  }, [fetchDiaryEntries, fetchAnnouncements, fetchStudents]);
+
+  useEffect(() => {
+    // Set up auth listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          await fetchUserProfile(session.user);
+          // Fetch data after profile is loaded
+          setTimeout(() => refreshData(), 100);
+        } else {
+          setUser(null);
+          setDiaryEntries([]);
+          setAnnouncements([]);
+          setStudents([]);
+        }
+        setLoading(false);
+      }
+    );
+
+    // Then check existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchUserProfile(session.user);
+        refreshData();
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [fetchUserProfile, refreshData]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Check admin/principal accounts
-    const adminUser = adminUsers[email];
-    if (adminUser && adminUser.password === password) {
-      const { password: _, ...userData } = adminUser;
-      setUser(userData);
-      return true;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return !error;
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  const addDiaryEntry = async (entry: Omit<DiaryEntry, "id">) => {
+    const { data: session } = await supabase.auth.getSession();
+    const { data: newEntry, error } = await supabase
+      .from("diary_entries")
+      .insert({
+        date: entry.date,
+        target_classes: entry.targetClasses,
+        note: entry.note || null,
+        created_by: entry.createdBy,
+        created_by_user_id: session?.session?.user?.id || null,
+      })
+      .select()
+      .single();
+
+    if (error || !newEntry) return;
+
+    // Insert subjects
+    if (entry.subjects.length > 0) {
+      await supabase.from("diary_subjects").insert(
+        entry.subjects.map((s) => ({
+          diary_entry_id: newEntry.id,
+          subject: s.subject,
+          homework: s.homework,
+        }))
+      );
     }
-    // Check student accounts
-    const student = students.find((s) => s.email === email && s.password === password);
-    if (student) {
-      setUser({
-        id: student.id,
-        name: student.name,
+
+    await fetchDiaryEntries();
+  };
+
+  const addAnnouncement = async (entry: Omit<Announcement, "id">) => {
+    const { data: session } = await supabase.auth.getSession();
+    await supabase.from("announcements").insert({
+      title: entry.title,
+      content: entry.content,
+      date: entry.date,
+      target_classes: entry.targetClasses,
+      priority: entry.priority,
+      created_by: entry.createdBy,
+      created_by_user_id: session?.session?.user?.id || null,
+    });
+
+    await fetchAnnouncements();
+  };
+
+  const deleteDiaryEntry = async (id: string) => {
+    await supabase.from("diary_entries").delete().eq("id", id);
+    await fetchDiaryEntries();
+  };
+
+  const deleteAnnouncement = async (id: string) => {
+    await supabase.from("announcements").delete().eq("id", id);
+    await fetchAnnouncements();
+  };
+
+  const addStudent = async (student: { name: string; email: string; class: ClassLevel; section: string; rollNumber: string; fatherName: string; phone?: string; password: string }) => {
+    const { data, error } = await supabase.functions.invoke("manage-users", {
+      body: {
+        action: "create",
         email: student.email,
-        role: "student",
+        password: student.password,
+        name: student.name,
         class: student.class,
-        rollNumber: student.rollNumber,
         section: student.section,
+        rollNumber: student.rollNumber,
         fatherName: student.fatherName,
-      });
-      return true;
-    }
-    return false;
+        phone: student.phone,
+        role: "student",
+      },
+    });
+
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+
+    await fetchStudents();
   };
 
-  const logout = () => setUser(null);
+  const removeStudent = async (id: string) => {
+    // id here is profile id, we need userId
+    const student = students.find((s) => s.id === id);
+    if (!student) return;
 
-  const addDiaryEntry = (entry: Omit<DiaryEntry, "id">) => {
-    setDiaryEntries((prev) => [{ ...entry, id: `d${Date.now()}` }, ...prev]);
-  };
+    await supabase.functions.invoke("manage-users", {
+      body: { action: "delete", userId: student.userId },
+    });
 
-  const addAnnouncement = (entry: Omit<Announcement, "id">) => {
-    setAnnouncements((prev) => [{ ...entry, id: `a${Date.now()}` }, ...prev]);
-  };
-
-  const deleteDiaryEntry = (id: string) => {
-    setDiaryEntries((prev) => prev.filter((d) => d.id !== id));
-  };
-
-  const deleteAnnouncement = (id: string) => {
-    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
-  };
-
-  const addStudent = (student: Omit<Student, "id">) => {
-    setStudents((prev) => [...prev, { ...student, id: `s${Date.now()}` }]);
-  };
-
-  const removeStudent = (id: string) => {
-    setStudents((prev) => prev.filter((s) => s.id !== id));
+    await fetchStudents();
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user, login, logout, isAuthenticated: !!user,
-        diaryEntries, announcements, addDiaryEntry, addAnnouncement,
-        deleteDiaryEntry, deleteAnnouncement,
-        students, addStudent, removeStudent,
+        user,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        loading,
+        diaryEntries,
+        announcements,
+        addDiaryEntry,
+        addAnnouncement,
+        deleteDiaryEntry,
+        deleteAnnouncement,
+        students,
+        addStudent,
+        removeStudent,
+        refreshData,
       }}
     >
       {children}
