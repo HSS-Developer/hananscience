@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
-
+  const [teachers, setTeachers] = useState<Student[]>([]);
   const fetchUserProfile = useCallback(async (supabaseUser: SupabaseUser) => {
     // Get profile
     const { data: profile } = await supabase
