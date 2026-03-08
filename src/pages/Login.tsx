@@ -76,8 +76,8 @@ const Login = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground leading-tight mb-3">
-              We Promise,<br />
-              <span className="text-primary-foreground">We Deliver.</span>
+              We Promise, ✨<br />
+              <span className="text-primary-foreground">We Deliver. 🚀</span>
             </h1>
             <p className="text-lg text-primary-foreground/80 font-body max-w-md">
               PG to Class 8 · Quality education with values that last a lifetime.
@@ -113,7 +113,7 @@ const Login = () => {
             <div className="text-center">
               <h2 className="text-2xl font-display font-bold text-foreground">HANAN SCIENCE</h2>
               <p className="text-sm font-display font-medium text-muted-foreground tracking-wide">(Kids) School</p>
-              <p className="text-xs font-body font-bold text-foreground mt-1 tracking-wide">We Promise, We Deliver.</p>
+              <p className="text-xs font-body font-bold text-foreground mt-1 tracking-wide">✨ We Promise, We Deliver 🚀</p>
             </div>
           </div>
 
@@ -180,7 +180,7 @@ const Login = () => {
 
           <div className="mt-6 text-center">
             <p className="text-xs font-body font-bold text-foreground tracking-wide">
-              We Promise, We Deliver.
+              ✨ We Promise, We Deliver 🚀
             </p>
             <p className="text-[10px] text-muted-foreground font-body mt-1">
               HANAN SCIENCE (Kids) SCHOOL · PG to Class 8
