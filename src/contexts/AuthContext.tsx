@@ -206,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setDiaryEntries([]);
           setAnnouncements([]);
           setStudents([]);
+          setTeachers([]);
         }
         setLoading(false);
       }
