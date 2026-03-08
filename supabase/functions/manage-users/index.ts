@@ -158,57 +158,6 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ error: "Invalid action" }), {
-          password: "principal123",
-          name: "Miss. Shamila",
-          role: "principal",
-        },
-      ];
-
-      const results = [];
-      for (const acc of accounts) {
-        // Check if user already exists
-        const { data: existing } =
-          await supabaseAdmin.auth.admin.listUsers();
-        const exists = existing?.users?.find((u) => u.email === acc.email);
-        if (exists) {
-          results.push({ email: acc.email, status: "already exists" });
-          continue;
-        }
-
-        const { data: newUser, error } =
-          await supabaseAdmin.auth.admin.createUser({
-            email: acc.email,
-            password: acc.password,
-            email_confirm: true,
-            user_metadata: { name: acc.name },
-          });
-
-        if (error) {
-          results.push({ email: acc.email, status: "error", error: error.message });
-          continue;
-        }
-
-        // Update role
-        await supabaseAdmin
-          .from("user_roles")
-          .update({ role: acc.role })
-          .eq("user_id", newUser.user.id);
-
-        // Update profile
-        await supabaseAdmin
-          .from("profiles")
-          .update({ name: acc.name })
-          .eq("user_id", newUser.user.id);
-
-        results.push({ email: acc.email, status: "created" });
-      }
-
-      return new Response(JSON.stringify({ success: true, results }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ error: "Invalid action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
