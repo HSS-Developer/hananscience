@@ -3,12 +3,12 @@ import {
   Calendar,
   Megaphone,
   User,
-  CreditCard,
   FileText,
   LogOut,
   BookMarked,
   Send,
   Users,
+  Info,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
@@ -35,9 +35,9 @@ const studentItems = [
 ];
 
 const studentSecondary = [
-  
   { title: "📝 Homework", url: "/assignments", icon: FileText },
   { title: "👤 Profile", url: "/profile", icon: User },
+  { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
 const adminItems = [
@@ -47,6 +47,7 @@ const adminItems = [
   { title: "👥 Students", url: "/admin/students", icon: Users },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
 const principalItems = [
@@ -56,6 +57,7 @@ const principalItems = [
   { title: "👥 Students", url: "/admin/students", icon: Users },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
 export function AppSidebar() {
@@ -75,7 +77,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <div className="p-4 flex items-center gap-3">
-        <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-xl flex-shrink-0 object-contain bg-white/90 p-0.5" />
+        <img src={schoolLogo} alt="HSc Kids Logo" className="w-12 h-12 rounded-xl flex-shrink-0 object-contain bg-white/90 p-0.5 shadow-fun" />
         {!collapsed && (
           <div className="min-w-0">
             <h2 className="font-display font-bold text-base text-sidebar-foreground leading-tight">HANAN SCIENCE</h2>
@@ -93,7 +95,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title + item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)} className="hover:bg-sidebar-accent rounded-xl">
+                  <SidebarMenuButton asChild isActive={isActive(item.url)} className="hover:bg-sidebar-accent rounded-xl transition-all">
                     <NavLink to={item.url} end className="transition-colors" activeClassName="bg-sidebar-accent text-sidebar-primary font-bold">
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span className="font-body text-sm">{item.title}</span>}
@@ -114,7 +116,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {secondItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive(item.url)} className="hover:bg-sidebar-accent rounded-xl">
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} className="hover:bg-sidebar-accent rounded-xl transition-all">
                       <NavLink to={item.url} end className="transition-colors" activeClassName="bg-sidebar-accent text-sidebar-primary font-bold">
                         <item.icon className="mr-2 h-4 w-4" />
                         {!collapsed && <span className="font-body text-sm">{item.title}</span>}
@@ -139,7 +141,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => { logout(); navigate("/"); }}
-              className="hover:bg-destructive/20 text-sidebar-foreground/70 hover:text-destructive rounded-xl"
+              className="hover:bg-destructive/20 text-sidebar-foreground/70 hover:text-destructive rounded-xl transition-all"
             >
               <LogOut className="mr-2 h-4 w-4" />
               {!collapsed && <span className="font-body text-sm">Sign Out</span>}
