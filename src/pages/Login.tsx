@@ -113,7 +113,7 @@ const Login = () => {
             <div className="text-center">
               <h2 className="text-2xl font-display font-bold text-foreground">HANAN SCIENCE</h2>
               <p className="text-sm font-display font-medium text-muted-foreground tracking-wide">(Kids) School</p>
-              <p className="text-xs font-body font-bold text-foreground mt-1 tracking-wide">We Promise, We Deliver.</p>
+              <p className="text-xs font-body font-bold text-foreground mt-1 tracking-wide">✨ We Promise, We Deliver 🚀</p>
             </div>
           </div>
 
