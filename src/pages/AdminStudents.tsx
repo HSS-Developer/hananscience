@@ -13,7 +13,8 @@ const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } 
 const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
 const AdminStudents = () => {
-  const { students, addStudent, removeStudent } = useAuth();
+  const { students, addStudent, removeStudent, user } = useAuth();
+  const isTeacher = user?.role === "teacher";
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
