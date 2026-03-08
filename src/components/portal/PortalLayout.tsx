@@ -35,7 +35,7 @@ const PortalLayout = () => {
                 <div className="hidden md:block">
                   <p className="text-sm font-bold font-body text-foreground">{user?.name}</p>
                   <p className="text-xs text-muted-foreground font-body">
-                    {user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Administrator" : `Class ${user?.class} · ${user?.section || "A"}`}
+                    {user?.role === "principal" ? "Principal" : user?.role === "admin" ? "Administrator" : user?.role === "teacher" ? "Teacher" : `Class ${user?.class} · ${user?.section || "A"}`}
                   </p>
                 </div>
               </div>

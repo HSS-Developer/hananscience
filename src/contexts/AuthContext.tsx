@@ -11,7 +11,7 @@ export const classDisplayName = (c: ClassLevel) => {
   return `Class ${c}`;
 };
 
-export type UserRole = "student" | "admin" | "principal";
+export type UserRole = "student" | "admin" | "principal" | "teacher";
 
 export interface DiaryEntry {
   id: string;

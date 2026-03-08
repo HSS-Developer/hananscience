@@ -187,14 +187,16 @@ const AdminStudents = () => {
                     <p className="text-xs text-muted-foreground font-body">Father: {student.fatherName}</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(student.id, student.name)}
-                  className="text-destructive hover:bg-destructive/10 rounded-xl"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                {!isTeacher && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(student.id, student.name)}
+                    className="text-destructive hover:bg-destructive/10 rounded-xl"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))
