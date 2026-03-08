@@ -157,17 +157,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "seed") {
-      // Seed initial admin and principal accounts
-      const accounts = [
-        {
-          email: "admin@hanan.edu",
-          password: "admin123",
-          name: "Gmd",
-          role: "admin",
-        },
-        {
-          email: "principal@hanan.edu",
+    return new Response(JSON.stringify({ error: "Invalid action" }), {
           password: "principal123",
           name: "Miss. Shamila",
           role: "principal",
