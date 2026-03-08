@@ -69,9 +69,11 @@ const AdminStudents = () => {
           <h1 className="text-2xl font-display font-bold text-foreground">👥 Students Management</h1>
           <p className="text-muted-foreground font-body text-sm">Total: {students.length} students</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
-          <UserPlus className="w-4 h-4 mr-2" /> Add Student
-        </Button>
+        {!isTeacher && (
+          <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
+            <UserPlus className="w-4 h-4 mr-2" /> Add Student
+          </Button>
+        )}
       </motion.div>
 
       {showForm && (
