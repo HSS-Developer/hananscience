@@ -12,8 +12,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Fredoka", "sans-serif"],
-        body: ["Nunito", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
+        body: ["Inter", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -84,21 +84,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "bounce-in": {
-          "0%": { opacity: "0", transform: "scale(0.8) translateY(10px)" },
-          "60%": { transform: "scale(1.05) translateY(-2px)" },
-          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
-        },
-        "wiggle": {
-          "0%, 100%": { transform: "rotate(-2deg)" },
-          "50%": { transform: "rotate(2deg)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "bounce-in": "bounce-in 0.5s ease-out forwards",
-        "wiggle": "wiggle 0.5s ease-in-out",
       },
     },
   },
