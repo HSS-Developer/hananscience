@@ -76,8 +76,8 @@ const Login = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <h1 className="text-4xl xl:text-5xl font-display font-bold text-primary-foreground leading-tight mb-3">
-              We Promise,<br />
-              <span className="text-primary-foreground">We Deliver.</span>
+              We Promise, ✨<br />
+              <span className="text-primary-foreground">We Deliver. 🚀</span>
             </h1>
             <p className="text-lg text-primary-foreground/80 font-body max-w-md">
               PG to Class 8 · Quality education with values that last a lifetime.
