@@ -165,36 +165,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchStudents = useCallback(async () => {
-    // Get all student profiles (admins can see all via RLS)
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*");
+    const { data: profiles } = await supabase.from("profiles").select("*");
+    const { data: roles } = await supabase.from("user_roles").select("*");
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("*");
+    if (!profiles || !roles) { setStudents([]); setTeachers([]); return; }
 
-    if (!profiles || !roles) { setStudents([]); return; }
+    const mapProfile = (p: any) => ({
+      id: p.id,
+      userId: p.user_id,
+      name: p.name,
+      email: p.email,
+      class: (p.class as ClassLevel) || "PG",
+      section: p.section || "A",
+      rollNumber: p.roll_number || "",
+      fatherName: p.father_name || "",
+      phone: p.phone || undefined,
+    });
 
-    const studentUserIds = roles
-      .filter((r) => r.role === "student")
-      .map((r) => r.user_id);
+    const studentUserIds = roles.filter((r) => r.role === "student").map((r) => r.user_id);
+    setStudents(profiles.filter((p) => studentUserIds.includes(p.user_id)).map(mapProfile));
 
-    const studentList = profiles
-      .filter((p) => studentUserIds.includes(p.user_id))
-      .map((p) => ({
-        id: p.id,
-        userId: p.user_id,
-        name: p.name,
-        email: p.email,
-        class: (p.class as ClassLevel) || "PG",
-        section: p.section || "A",
-        rollNumber: p.roll_number || "",
-        fatherName: p.father_name || "",
-        phone: p.phone || undefined,
-      }));
-
-    setStudents(studentList);
+    const teacherUserIds = roles.filter((r) => r.role === "teacher").map((r) => r.user_id);
+    setTeachers(profiles.filter((p) => teacherUserIds.includes(p.user_id)).map(mapProfile));
   }, []);
 
   const refreshData = useCallback(async () => {
