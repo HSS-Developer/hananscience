@@ -66,6 +66,7 @@ const principalItems = [
   { title: "📓 Send Diary", url: "/admin/diary", icon: Send },
   { title: "📢 Send Notice", url: "/admin/announcement", icon: Megaphone },
   { title: "👥 Students", url: "/admin/students", icon: Users },
+  { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
