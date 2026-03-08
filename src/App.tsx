@@ -12,13 +12,13 @@ import Attendance from "./pages/Attendance";
 import Timetable from "./pages/Timetable";
 import AdminStudents from "./pages/AdminStudents";
 import Announcements from "./pages/Announcements";
-
 import Assignments from "./pages/Assignments";
 import Profile from "./pages/Profile";
 import SettingsPage from "./pages/SettingsPage";
 import Diary from "./pages/Diary";
 import AdminSendDiary from "./pages/AdminSendDiary";
 import AdminSendAnnouncement from "./pages/AdminSendAnnouncement";
+import AboutUs from "./pages/AboutUs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,13 +37,13 @@ const App = () => (
               <Route path="/diary" element={<Diary />} />
               <Route path="/timetable" element={<Timetable />} />
               <Route path="/announcements" element={<Announcements />} />
-              
               <Route path="/assignments" element={<Assignments />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin/diary" element={<AdminSendDiary />} />
               <Route path="/admin/announcement" element={<AdminSendAnnouncement />} />
               <Route path="/admin/students" element={<AdminStudents />} />
+              <Route path="/about" element={<AboutUs />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
