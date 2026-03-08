@@ -68,8 +68,11 @@ interface AuthContextType {
   deleteDiaryEntry: (id: string) => Promise<void>;
   deleteAnnouncement: (id: string) => Promise<void>;
   students: Student[];
+  teachers: Student[];
   addStudent: (student: { name: string; email: string; class: ClassLevel; section: string; rollNumber: string; fatherName: string; phone?: string; password: string }) => Promise<void>;
+  addTeacher: (teacher: { name: string; email: string; phone?: string; password: string }) => Promise<void>;
   removeStudent: (id: string) => Promise<void>;
+  removeTeacher: (id: string) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 
