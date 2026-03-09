@@ -20,6 +20,7 @@ import Diary from "./pages/Diary";
 import AdminSendDiary from "./pages/AdminSendDiary";
 import AdminSendAnnouncement from "./pages/AdminSendAnnouncement";
 import AboutUs from "./pages/AboutUs";
+import Uniform from "./pages/Uniform";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
