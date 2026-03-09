@@ -69,6 +69,14 @@ const Diary = () => {
                             {classDisplayName(c)}
                           </span>
                         ))}
+                        {entry.targetSections && entry.targetSections.length > 0 && entry.targetSections.map((s) => {
+                          const [cls, sec] = s.split("-");
+                          return (
+                            <span key={s} className="text-[10px] font-body font-bold px-2 py-1 rounded-full bg-accent/20 text-accent-foreground">
+                              {classDisplayName(cls as any)}-{sec}
+                            </span>
+                          );
+                        })}
                       </div>
                       {isAdmin && (
                         <Button
