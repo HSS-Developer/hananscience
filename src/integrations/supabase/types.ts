@@ -154,6 +154,30 @@ export type Database = {
         }
         Relationships: []
       }
+      uniform_images: {
+        Row: {
+          id: string
+          image_url: string
+          type: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          type: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          type?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
