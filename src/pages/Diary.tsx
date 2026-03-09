@@ -12,7 +12,17 @@ const Diary = () => {
 
   const entries = isAdmin
     ? diaryEntries
-    : diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
+    : diaryEntries.filter((d) => {
+        if (!user) return false;
+        if (!d.targetClasses.includes(user.class)) return false;
+        // If sections exist, filter by section too
+        if (d.targetSections && d.targetSections.length > 0) {
+          const userSection = user.section || "A";
+          const sectionKey = `${user.class}-${userSection}`;
+          return d.targetSections.includes(sectionKey);
+        }
+        return true;
+      });
 
   const handleDelete = async (id: string) => {
     try {
