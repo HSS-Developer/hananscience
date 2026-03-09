@@ -59,6 +59,7 @@ export type Database = {
           id: string
           note: string | null
           target_classes: string[]
+          target_sections: string[] | null
         }
         Insert: {
           created_at?: string
@@ -68,6 +69,7 @@ export type Database = {
           id?: string
           note?: string | null
           target_classes: string[]
+          target_sections?: string[] | null
         }
         Update: {
           created_at?: string
@@ -77,6 +79,7 @@ export type Database = {
           id?: string
           note?: string | null
           target_classes?: string[]
+          target_sections?: string[] | null
         }
         Relationships: []
       }

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth, classDisplayName } from "@/contexts/AuthContext";
+import { useAuth, classDisplayName, getSectionsForClass } from "@/contexts/AuthContext";
 import { Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +12,17 @@ const Diary = () => {
 
   const entries = isAdmin
     ? diaryEntries
-    : diaryEntries.filter((d) => user && d.targetClasses.includes(user.class));
+    : diaryEntries.filter((d) => {
+        if (!user) return false;
+        if (!d.targetClasses.includes(user.class)) return false;
+        // If sections exist, filter by section too
+        if (d.targetSections && d.targetSections.length > 0) {
+          const userSection = user.section || "A";
+          const sectionKey = `${user.class}-${userSection}`;
+          return d.targetSections.includes(sectionKey);
+        }
+        return true;
+      });
 
   const handleDelete = async (id: string) => {
     try {
@@ -59,6 +69,14 @@ const Diary = () => {
                             {classDisplayName(c)}
                           </span>
                         ))}
+                        {entry.targetSections && entry.targetSections.length > 0 && entry.targetSections.map((s) => {
+                          const [cls, sec] = s.split("-");
+                          return (
+                            <span key={s} className="text-[10px] font-body font-bold px-2 py-1 rounded-full bg-accent/20 text-accent-foreground">
+                              {classDisplayName(cls as any)}-{sec}
+                            </span>
+                          );
+                        })}
                       </div>
                       {isAdmin && (
                         <Button

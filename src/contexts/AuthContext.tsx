@@ -11,12 +11,20 @@ export const classDisplayName = (c: ClassLevel) => {
   return `Class ${c}`;
 };
 
+export const getSectionsForClass = (c: ClassLevel): string[] => {
+  if (["PG", "Nursery", "KG", "1", "2", "3"].includes(c)) return ["A", "B"];
+  if (c === "5") return ["Girls", "Boys", "Important"];
+  if (["4", "6", "7", "8"].includes(c)) return ["Girls", "Boys"];
+  return ["A"];
+};
+
 export type UserRole = "student" | "admin" | "principal" | "teacher";
 
 export interface DiaryEntry {
   id: string;
   date: string;
   targetClasses: ClassLevel[];
+  targetSections?: string[];
   subjects: { subject: string; homework: string }[];
   note?: string;
   createdBy: string;
@@ -133,6 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: e.id,
       date: e.date,
       targetClasses: e.target_classes as ClassLevel[],
+      targetSections: (e as any).target_sections as string[] || [],
       subjects: (subjects || [])
         .filter((s) => s.diary_entry_id === e.id)
         .map((s) => ({ subject: s.subject, homework: s.homework })),
@@ -241,10 +250,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .insert({
         date: entry.date,
         target_classes: entry.targetClasses,
+        target_sections: entry.targetSections || [],
         note: entry.note || null,
         created_by: entry.createdBy,
         created_by_user_id: session?.session?.user?.id || null,
-      })
+      } as any)
       .select()
       .single();
 

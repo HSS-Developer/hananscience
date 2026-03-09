@@ -1,31 +1,78 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth, ALL_CLASSES, classDisplayName, type ClassLevel } from "@/contexts/AuthContext";
+import { useAuth, ALL_CLASSES, classDisplayName, getSectionsForClass, type ClassLevel } from "@/contexts/AuthContext";
 import { Send, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const AdminSendDiary = () => {
   const { user, addDiaryEntry } = useAuth();
   const [selectedClasses, setSelectedClasses] = useState<ClassLevel[]>([]);
+  const [selectedSections, setSelectedSections] = useState<Record<ClassLevel, string[]>>({} as Record<ClassLevel, string[]>);
   const [subjects, setSubjects] = useState([{ subject: "", homework: "" }]);
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
 
   const toggleClass = (c: ClassLevel) => {
-    setSelectedClasses((prev) =>
-      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
-    );
+    setSelectedClasses((prev) => {
+      if (prev.includes(c)) {
+        // Remove class and its sections
+        setSelectedSections((s) => { const n = { ...s }; delete n[c]; return n; });
+        return prev.filter((x) => x !== c);
+      }
+      // Add class with all sections selected by default
+      setSelectedSections((s) => ({ ...s, [c]: getSectionsForClass(c) }));
+      return [...prev, c];
+    });
   };
 
   const selectAll = () => {
-    setSelectedClasses(selectedClasses.length === ALL_CLASSES.length ? [] : [...ALL_CLASSES]);
+    if (selectedClasses.length === ALL_CLASSES.length) {
+      setSelectedClasses([]);
+      setSelectedSections({} as Record<ClassLevel, string[]>);
+    } else {
+      setSelectedClasses([...ALL_CLASSES]);
+      const allSections = {} as Record<ClassLevel, string[]>;
+      ALL_CLASSES.forEach((c) => { allSections[c] = getSectionsForClass(c); });
+      setSelectedSections(allSections);
+    }
   };
+
+  const toggleSection = (cls: ClassLevel, section: string) => {
+    setSelectedSections((prev) => {
+      const current = prev[cls] || [];
+      const updated = current.includes(section)
+        ? current.filter((s) => s !== section)
+        : [...current, section];
+      return { ...prev, [cls]: updated };
+    });
+  };
+
+  const selectAllSections = (cls: ClassLevel) => {
+    const allSections = getSectionsForClass(cls);
+    const current = selectedSections[cls] || [];
+    setSelectedSections((prev) => ({
+      ...prev,
+      [cls]: current.length === allSections.length ? [] : [...allSections],
+    }));
+  };
+
+  // Flatten all selected sections for sending
+  const allSelectedSections = useMemo(() => {
+    const sections: string[] = [];
+    selectedClasses.forEach((c) => {
+      (selectedSections[c] || []).forEach((s) => {
+        const key = `${c}-${s}`;
+        if (!sections.includes(key)) sections.push(key);
+      });
+    });
+    return sections;
+  }, [selectedClasses, selectedSections]);
 
   const addSubject = () => setSubjects((prev) => [...prev, { subject: "", homework: "" }]);
   const removeSubject = (i: number) => setSubjects((prev) => prev.filter((_, idx) => idx !== i));
@@ -36,6 +83,12 @@ const AdminSendDiary = () => {
   const handleSend = async () => {
     if (selectedClasses.length === 0) {
       toast({ title: "⚠️ Select at least one class!", variant: "destructive" });
+      return;
+    }
+    // Check that at least one section is selected
+    const hasSection = selectedClasses.some((c) => (selectedSections[c] || []).length > 0);
+    if (!hasSection) {
+      toast({ title: "⚠️ Select at least one section!", variant: "destructive" });
       return;
     }
     const validSubjects = subjects.filter((s) => s.subject.trim() && s.homework.trim());
@@ -49,6 +102,7 @@ const AdminSendDiary = () => {
       await addDiaryEntry({
         date: new Date().toISOString().split("T")[0],
         targetClasses: selectedClasses,
+        targetSections: allSelectedSections,
         subjects: validSubjects,
         note: note.trim() || undefined,
         createdBy: user?.name || "Admin",
@@ -60,6 +114,7 @@ const AdminSendDiary = () => {
       setTimeout(() => {
         setSent(false);
         setSelectedClasses([]);
+        setSelectedSections({} as Record<ClassLevel, string[]>);
         setSubjects([{ subject: "", homework: "" }]);
         setNote("");
       }, 2000);
@@ -73,7 +128,7 @@ const AdminSendDiary = () => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">📓 Send Diary</h1>
-        <p className="text-muted-foreground font-body">Send homework diary to specific classes.</p>
+        <p className="text-muted-foreground font-body">Send homework diary to specific classes & sections.</p>
       </div>
 
       <Card className="shadow-card border-border/50 rounded-2xl">
@@ -85,7 +140,7 @@ const AdminSendDiary = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {ALL_CLASSES.map((c) => (
               <button
@@ -101,6 +156,45 @@ const AdminSendDiary = () => {
               </button>
             ))}
           </div>
+
+          {/* Section selection for selected classes */}
+          {selectedClasses.length > 0 && (
+            <div className="space-y-3 pt-2 border-t border-border/30">
+              <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider">📋 Select Sections</p>
+              {selectedClasses.map((cls) => {
+                const sections = getSectionsForClass(cls);
+                const selected = selectedSections[cls] || [];
+                return (
+                  <div key={cls} className="p-3 rounded-xl bg-muted/30 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-body font-bold text-sm text-foreground">{classDisplayName(cls)}</span>
+                      <button
+                        onClick={() => selectAllSections(cls)}
+                        className="text-[10px] font-body font-semibold text-primary hover:underline"
+                      >
+                        {selected.length === sections.length ? "Deselect All" : "Select All"}
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {sections.map((sec) => (
+                        <button
+                          key={sec}
+                          onClick={() => toggleSection(cls, sec)}
+                          className={`px-3 py-1.5 rounded-lg font-body font-semibold text-xs transition-all ${
+                            selected.includes(sec)
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "bg-background text-muted-foreground border border-border/50 hover:border-primary/50"
+                          }`}
+                        >
+                          {sec}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 

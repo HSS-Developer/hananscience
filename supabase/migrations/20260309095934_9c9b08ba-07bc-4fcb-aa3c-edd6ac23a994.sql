@@ -1,0 +1,1 @@
+ALTER TABLE public.diary_entries ADD COLUMN target_sections text[] DEFAULT '{}'::text[];
