@@ -11,6 +11,13 @@ export const classDisplayName = (c: ClassLevel) => {
   return `Class ${c}`;
 };
 
+export const getSectionsForClass = (c: ClassLevel): string[] => {
+  if (["PG", "Nursery", "KG", "1", "2", "3"].includes(c)) return ["A", "B"];
+  if (c === "5") return ["Girls", "Boys", "Important"];
+  if (["4", "6", "7", "8"].includes(c)) return ["Girls", "Boys"];
+  return ["A"];
+};
+
 export type UserRole = "student" | "admin" | "principal" | "teacher";
 
 export interface DiaryEntry {
