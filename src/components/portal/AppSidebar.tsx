@@ -10,6 +10,7 @@ import {
   Users,
   Info,
   GraduationCap,
+  Shirt,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
@@ -33,6 +34,7 @@ const studentItems = [
   { title: "📓 Diary", url: "/diary", icon: BookMarked },
   { title: "📅 Timetable", url: "/timetable", icon: Calendar },
   { title: "📢 Notices", url: "/announcements", icon: Megaphone },
+  { title: "👔 Uniform", url: "/uniform", icon: Shirt },
 ];
 
 const studentSecondary = [
@@ -47,6 +49,7 @@ const teacherItems = [
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "👥 View Students", url: "/admin/students", icon: Users },
+  { title: "👔 Uniform", url: "/uniform", icon: Shirt },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
@@ -58,6 +61,7 @@ const adminItems = [
   { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "👔 Uniform", url: "/uniform", icon: Shirt },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
@@ -69,6 +73,7 @@ const principalItems = [
   { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "👔 Uniform", url: "/uniform", icon: Shirt },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
