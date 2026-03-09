@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth, classDisplayName } from "@/contexts/AuthContext";
+import { useAuth, classDisplayName, getSectionsForClass } from "@/contexts/AuthContext";
 import { Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
