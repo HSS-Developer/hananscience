@@ -250,10 +250,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .insert({
         date: entry.date,
         target_classes: entry.targetClasses,
+        target_sections: entry.targetSections || [],
         note: entry.note || null,
         created_by: entry.createdBy,
         created_by_user_id: session?.session?.user?.id || null,
-      })
+      } as any)
       .select()
       .single();
 
