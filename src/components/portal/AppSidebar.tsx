@@ -49,6 +49,7 @@ const teacherItems = [
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "👥 View Students", url: "/admin/students", icon: Users },
+  { title: "👔 Uniform", url: "/uniform", icon: Shirt },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
