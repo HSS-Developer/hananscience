@@ -24,6 +24,7 @@ export interface DiaryEntry {
   id: string;
   date: string;
   targetClasses: ClassLevel[];
+  targetSections?: string[];
   subjects: { subject: string; homework: string }[];
   note?: string;
   createdBy: string;
