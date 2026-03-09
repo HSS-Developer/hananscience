@@ -141,6 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: e.id,
       date: e.date,
       targetClasses: e.target_classes as ClassLevel[],
+      targetSections: (e as any).target_sections as string[] || [],
       subjects: (subjects || [])
         .filter((s) => s.diary_entry_id === e.id)
         .map((s) => ({ subject: s.subject, homework: s.homework })),
