@@ -35,6 +35,7 @@ const studentItems = [
   { title: "📓 Diary", url: "/diary", icon: BookMarked },
   { title: "📅 Timetable", url: "/timetable", icon: Calendar },
   { title: "📢 Notices", url: "/announcements", icon: Megaphone },
+  { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
 ];
 
