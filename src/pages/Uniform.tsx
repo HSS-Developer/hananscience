@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, ImageIcon } from "lucide-react";
+import { Upload, Loader2, ImageIcon, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface UniformImage {
@@ -50,18 +50,15 @@ const Uniform = () => {
       const ext = file.name.split(".").pop();
       const filePath = `${type}-uniform.${ext}`;
 
-      // Upload to storage (overwrite)
       const { error: uploadError } = await supabase.storage
         .from("uniforms")
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: urlData } = supabase.storage.from("uniforms").getPublicUrl(filePath);
       const imageUrl = urlData.publicUrl + "?t=" + Date.now();
 
-      // Upsert into uniform_images table
       const existing = uniforms.find((u) => u.type === type);
       if (existing) {
         await (supabase.from("uniform_images" as any) as any).update({
@@ -90,7 +87,7 @@ const Uniform = () => {
     const inputRef = type === "girls" ? girlsInputRef : boysInputRef;
 
     return (
-      <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm bg-card/80 flex-1">
+      <Card className="shadow-card border-border/50 rounded-2xl overflow-hidden glass-card flex-1">
         <CardHeader className="pb-2">
           <CardTitle className="font-display text-lg flex items-center gap-2">
             <span className="text-2xl">{emoji}</span> {label} Uniform
@@ -98,12 +95,23 @@ const Uniform = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {imageUrl ? (
-            <div className="relative rounded-xl overflow-hidden bg-muted aspect-[3/4]">
-              <img
-                src={imageUrl}
-                alt={`${label} Uniform`}
-                className="w-full h-full object-cover"
-              />
+            <div className="space-y-3">
+              <div className="relative rounded-xl overflow-hidden bg-muted aspect-[3/4]">
+                <img
+                  src={imageUrl}
+                  alt={`${label} Uniform`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <a
+                href={imageUrl}
+                download={`${type}-uniform`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-body font-bold hover:bg-primary/20 transition-colors w-full justify-center"
+              >
+                <Download className="w-4 h-4" /> Download {label} Uniform
+              </a>
             </div>
           ) : (
             <div className="rounded-xl bg-muted/50 aspect-[3/4] flex flex-col items-center justify-center gap-3">
@@ -157,7 +165,7 @@ const Uniform = () => {
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">👔 School Uniform</h1>
         <p className="text-muted-foreground font-body">
-          {isAdmin ? "Upload and manage uniform images for students" : "View the school uniform for boys and girls"}
+          {isAdmin ? "Upload and manage uniform images for students" : "View and download school uniform photos"}
         </p>
       </div>
 

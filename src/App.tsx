@@ -21,6 +21,7 @@ import AdminSendDiary from "./pages/AdminSendDiary";
 import AdminSendAnnouncement from "./pages/AdminSendAnnouncement";
 import AboutUs from "./pages/AboutUs";
 import Uniform from "./pages/Uniform";
+import Syllabus from "./pages/Syllabus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/admin/teachers" element={<AdminTeachers />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/uniform" element={<Uniform />} />
+              <Route path="/syllabus" element={<Syllabus />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
