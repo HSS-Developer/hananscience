@@ -155,7 +155,9 @@ const AdminSendDiary = () => {
         }
       }
 
-      // Refresh diary entries
+      // Refresh diary entries via context
+      const { refreshData } = await import("@/contexts/AuthContext").then(() => ({})) as any;
+      // We'll just reload the page data
       await (window as any).__refreshDiary?.();
 
       setSent(true);
