@@ -50,6 +50,38 @@ export type Database = {
         }
         Relationships: []
       }
+      diary_attachments: {
+        Row: {
+          created_at: string
+          diary_entry_id: string
+          file_name: string
+          id: string
+          image_url: string
+        }
+        Insert: {
+          created_at?: string
+          diary_entry_id: string
+          file_name: string
+          id?: string
+          image_url: string
+        }
+        Update: {
+          created_at?: string
+          diary_entry_id?: string
+          file_name?: string
+          id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_attachments_diary_entry_id_fkey"
+            columns: ["diary_entry_id"]
+            isOneToOne: false
+            referencedRelation: "diary_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diary_entries: {
         Row: {
           created_at: string
@@ -151,6 +183,30 @@ export type Database = {
           section?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      syllabus_images: {
+        Row: {
+          class: string
+          created_at: string
+          id: string
+          image_url: string
+          uploaded_by: string
+        }
+        Insert: {
+          class: string
+          created_at?: string
+          id?: string
+          image_url: string
+          uploaded_by: string
+        }
+        Update: {
+          class?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          uploaded_by?: string
         }
         Relationships: []
       }
