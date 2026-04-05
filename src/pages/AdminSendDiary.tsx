@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth, ALL_CLASSES, classDisplayName, getSectionsForClass, type ClassLevel } from "@/contexts/AuthContext";
-import { Send, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
+import { Send, Plus, Trash2, CheckCircle2, Loader2, Upload, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminSendDiary = () => {
   const { user, addDiaryEntry } = useAuth();
@@ -17,15 +18,15 @@ const AdminSendDiary = () => {
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleClass = (c: ClassLevel) => {
     setSelectedClasses((prev) => {
       if (prev.includes(c)) {
-        // Remove class and its sections
         setSelectedSections((s) => { const n = { ...s }; delete n[c]; return n; });
         return prev.filter((x) => x !== c);
       }
-      // Add class with all sections selected by default
       setSelectedSections((s) => ({ ...s, [c]: getSectionsForClass(c) }));
       return [...prev, c];
     });
@@ -62,7 +63,6 @@ const AdminSendDiary = () => {
     }));
   };
 
-  // Flatten all selected sections for sending
   const allSelectedSections = useMemo(() => {
     const sections: string[] = [];
     selectedClasses.forEach((c) => {
@@ -80,12 +80,21 @@ const AdminSendDiary = () => {
     setSubjects((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: value } : s)));
   };
 
+  const addFiles = (files: FileList | null) => {
+    if (!files) return;
+    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    setAttachments((prev) => [...prev, ...imageFiles]);
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSend = async () => {
     if (selectedClasses.length === 0) {
       toast({ title: "⚠️ Select at least one class!", variant: "destructive" });
       return;
     }
-    // Check that at least one section is selected
     const hasSection = selectedClasses.some((c) => (selectedSections[c] || []).length > 0);
     if (!hasSection) {
       toast({ title: "⚠️ Select at least one section!", variant: "destructive" });
@@ -99,14 +108,55 @@ const AdminSendDiary = () => {
 
     setSending(true);
     try {
-      await addDiaryEntry({
-        date: new Date().toISOString().split("T")[0],
-        targetClasses: selectedClasses,
-        targetSections: allSelectedSections,
-        subjects: validSubjects,
-        note: note.trim() || undefined,
-        createdBy: user?.name || "Admin",
-      });
+      // Create diary entry first
+      const { data: session } = await supabase.auth.getSession();
+      const { data: newEntry, error } = await supabase
+        .from("diary_entries")
+        .insert({
+          date: new Date().toISOString().split("T")[0],
+          target_classes: selectedClasses,
+          target_sections: allSelectedSections,
+          note: note.trim() || null,
+          created_by: user?.name || "Admin",
+          created_by_user_id: session?.session?.user?.id || null,
+        } as any)
+        .select()
+        .single();
+
+      if (error || !newEntry) throw error || new Error("Failed to create entry");
+
+      // Insert subjects
+      if (validSubjects.length > 0) {
+        await supabase.from("diary_subjects").insert(
+          validSubjects.map((s) => ({
+            diary_entry_id: newEntry.id,
+            subject: s.subject,
+            homework: s.homework,
+          }))
+        );
+      }
+
+      // Upload attachments
+      for (const file of attachments) {
+        const ext = file.name.split(".").pop();
+        const filePath = `${newEntry.id}/${Date.now()}-${file.name}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("diary-attachments")
+          .upload(filePath, file, { upsert: true });
+
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("diary-attachments").getPublicUrl(filePath);
+          await (supabase.from("diary_attachments" as any) as any).insert({
+            diary_entry_id: newEntry.id,
+            image_url: urlData.publicUrl,
+            file_name: file.name,
+          });
+        }
+      }
+
+      // Refresh diary entries
+      await (window as any).__refreshDiary?.();
 
       setSent(true);
       toast({ title: "✅ Diary sent successfully!" });
@@ -117,6 +167,7 @@ const AdminSendDiary = () => {
         setSelectedSections({} as Record<ClassLevel, string[]>);
         setSubjects([{ subject: "", homework: "" }]);
         setNote("");
+        setAttachments([]);
       }, 2000);
     } catch {
       toast({ title: "❌ Failed to send diary", variant: "destructive" });
@@ -131,7 +182,7 @@ const AdminSendDiary = () => {
         <p className="text-muted-foreground font-body">Send homework diary to specific classes & sections.</p>
       </div>
 
-      <Card className="shadow-card border-border/50 rounded-2xl">
+      <Card className="shadow-card border-border/50 rounded-2xl glass-card">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="font-display text-lg">🏫 Select Classes</CardTitle>
@@ -157,12 +208,11 @@ const AdminSendDiary = () => {
             ))}
           </div>
 
-          {/* Section selection for selected classes */}
           {selectedClasses.length > 0 && (
             <div className="space-y-3 pt-2 border-t border-border/30">
               <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider">📋 Select Sections</p>
               {selectedClasses.map((cls) => {
-                const sections = getSectionsForClass(cls);
+                const secs = getSectionsForClass(cls);
                 const selected = selectedSections[cls] || [];
                 return (
                   <div key={cls} className="p-3 rounded-xl bg-muted/30 space-y-2">
@@ -172,11 +222,11 @@ const AdminSendDiary = () => {
                         onClick={() => selectAllSections(cls)}
                         className="text-[10px] font-body font-semibold text-primary hover:underline"
                       >
-                        {selected.length === sections.length ? "Deselect All" : "Select All"}
+                        {selected.length === secs.length ? "Deselect All" : "Select All"}
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {sections.map((sec) => (
+                      {secs.map((sec) => (
                         <button
                           key={sec}
                           onClick={() => toggleSection(cls, sec)}
@@ -198,7 +248,7 @@ const AdminSendDiary = () => {
         </CardContent>
       </Card>
 
-      <Card className="shadow-card border-border/50 rounded-2xl">
+      <Card className="shadow-card border-border/50 rounded-2xl glass-card">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="font-display text-lg">📖 Subjects & Homework</CardTitle>
@@ -233,7 +283,48 @@ const AdminSendDiary = () => {
         </CardContent>
       </Card>
 
-      <Card className="shadow-card border-border/50 rounded-2xl">
+      {/* Attachments */}
+      <Card className="shadow-card border-border/50 rounded-2xl glass-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="font-display text-lg">📎 Attach Images (Optional)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
+          />
+          <Button
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full rounded-xl font-body"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Select PNG Images
+          </Button>
+
+          {attachments.length > 0 && (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {attachments.map((file, i) => (
+                <div key={i} className="relative rounded-xl overflow-hidden bg-muted/30 border border-border/30">
+                  <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-20 object-cover" />
+                  <button
+                    onClick={() => removeAttachment(i)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  <p className="text-[8px] font-body text-muted-foreground p-1 truncate">{file.name}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card border-border/50 rounded-2xl glass-card">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-lg">💡 Additional Note (Optional)</CardTitle>
         </CardHeader>
