@@ -11,6 +11,7 @@ import {
   Info,
   GraduationCap,
   Shirt,
+  BookOpen,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
