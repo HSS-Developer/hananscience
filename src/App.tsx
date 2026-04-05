@@ -21,6 +21,7 @@ import AdminSendDiary from "./pages/AdminSendDiary";
 import AdminSendAnnouncement from "./pages/AdminSendAnnouncement";
 import AboutUs from "./pages/AboutUs";
 import Uniform from "./pages/Uniform";
+import Syllabus from "./pages/Syllabus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
