@@ -77,6 +77,7 @@ const principalItems = [
   { title: "📚 Teachers", url: "/admin/teachers", icon: GraduationCap },
   { title: "👁 View Diary", url: "/diary", icon: BookMarked },
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
+  { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
