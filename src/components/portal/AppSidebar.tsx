@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Shirt,
   BookOpen,
+  DollarSign,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import schoolLogo from "@/assets/school-logo.png";
@@ -37,6 +38,7 @@ const studentItems = [
   { title: "📢 Notices", url: "/announcements", icon: Megaphone },
   { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
+  { title: "💰 Fees", url: "/fees", icon: DollarSign },
 ];
 
 const studentSecondary = [
@@ -53,6 +55,7 @@ const teacherItems = [
   { title: "👥 View Students", url: "/admin/students", icon: Users },
   { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
+  { title: "💰 Fees", url: "/fees", icon: DollarSign },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
@@ -66,6 +69,7 @@ const adminItems = [
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
+  { title: "💰 Fees", url: "/fees", icon: DollarSign },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
