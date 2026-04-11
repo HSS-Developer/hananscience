@@ -203,13 +203,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchDiaryEntries, fetchAnnouncements, fetchStudents]);
 
   useEffect(() => {
-    // Set up auth listener FIRST
+    let mounted = true;
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
         if (session?.user) {
           await fetchUserProfile(session.user);
-          // Fetch data after profile is loaded
-          setTimeout(() => refreshData(), 100);
         } else {
           setUser(null);
           setDiaryEntries([]);
@@ -217,21 +217,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setStudents([]);
           setTeachers([]);
         }
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     );
 
-    // Then check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       if (session?.user) {
         fetchUserProfile(session.user);
-        refreshData();
       }
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [fetchUserProfile, refreshData]);
+    return () => { mounted = false; subscription.unsubscribe(); };
+  }, [fetchUserProfile]);
+
+  // Lazy load data only when user is set
+  useEffect(() => {
+    if (user) {
+      refreshData();
+    }
+  }, [user?.id]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
