@@ -29,6 +29,50 @@ const AdminStudents = () => {
   const [fatherName, setFatherName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("student123");
+  const [csvImporting, setCsvImporting] = useState(false);
+
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter(l => l.trim());
+      if (lines.length < 2) { toast({ title: "❌ CSV empty!", variant: "destructive" }); setCsvImporting(false); return; }
+      const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+      let success = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const vals = lines[i].split(",").map(v => v.trim());
+        const row: any = {};
+        headers.forEach((h, idx) => { row[h] = vals[idx] || ""; });
+        try {
+          await addStudent({
+            name: row["name"] || row["student_name"] || "",
+            email: row["email"] || "",
+            class: (row["class"] || "1") as ClassLevel,
+            section: row["section"] || "A",
+            rollNumber: row["roll_number"] || row["rollnumber"] || "",
+            fatherName: row["father_name"] || row["fathername"] || "",
+            phone: row["phone"] || "",
+            password: row["password"] || "student123",
+          });
+          success++;
+        } catch {}
+      }
+      toast({ title: `✅ ${success} students imported!` });
+    } catch { toast({ title: "❌ CSV import failed", variant: "destructive" }); }
+    setCsvImporting(false);
+    e.target.value = "";
+  };
+
+  const downloadTemplate = () => {
+    const csv = "name,email,class,section,roll_number,father_name,phone,password\nAhmed Khan,ahmed@hanan.edu,5,Boys,HSS-001,Mr Khan,03001234567,student123\n";
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "students_template.csv";
+    a.click();
+  };
 
   const handleAdd = async () => {
     if (!name || !email || !rollNumber || !fatherName) {
@@ -70,9 +114,20 @@ const AdminStudents = () => {
           <p className="text-muted-foreground font-body text-sm">Total: {students.length} students</p>
         </div>
         {!isTeacher && (
-          <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
-            <UserPlus className="w-4 h-4 mr-2" /> Add Student
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button onClick={() => setShowForm(!showForm)} className="gradient-fun text-primary-foreground rounded-xl font-body font-bold shadow-elevated">
+              <UserPlus className="w-4 h-4 mr-2" /> Add Student
+            </Button>
+            <label className="cursor-pointer">
+              <input type="file" accept=".csv" onChange={handleCSVImport} className="hidden" />
+              <Button asChild variant="outline" className="rounded-xl font-body" disabled={csvImporting}>
+                <span>{csvImporting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Importing...</> : <><Upload className="w-4 h-4 mr-2" />CSV Import</>}</span>
+              </Button>
+            </label>
+            <Button variant="outline" onClick={downloadTemplate} className="rounded-xl font-body">
+              <Download className="w-4 h-4 mr-2" /> Template
+            </Button>
+          </div>
         )}
       </motion.div>
 
