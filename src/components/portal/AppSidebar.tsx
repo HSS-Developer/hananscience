@@ -83,6 +83,7 @@ const principalItems = [
   { title: "📢 View Notices", url: "/announcements", icon: Megaphone },
   { title: "📚 Syllabus", url: "/syllabus", icon: BookOpen },
   { title: "👔 Uniform", url: "/uniform", icon: Shirt },
+  { title: "💰 Fees", url: "/fees", icon: DollarSign },
   { title: "ℹ️ About Us", url: "/about", icon: Info },
 ];
 
