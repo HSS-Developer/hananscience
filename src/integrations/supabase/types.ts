@@ -144,6 +144,54 @@ export type Database = {
           },
         ]
       }
+      fees: {
+        Row: {
+          amount: number
+          class: string
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          month: string
+          paid_date: string | null
+          section: string
+          status: Database["public"]["Enums"]["fee_status"]
+          student_name: string
+          student_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          class: string
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          month: string
+          paid_date?: string | null
+          section?: string
+          status?: Database["public"]["Enums"]["fee_status"]
+          student_name: string
+          student_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          class?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          month?: string
+          paid_date?: string | null
+          section?: string
+          status?: Database["public"]["Enums"]["fee_status"]
+          student_name?: string
+          student_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           class: string | null
@@ -271,6 +319,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "principal" | "student" | "teacher"
+      fee_status: "pending" | "paid" | "overdue"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -399,6 +448,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "principal", "student", "teacher"],
+      fee_status: ["pending", "paid", "overdue"],
     },
   },
 } as const
