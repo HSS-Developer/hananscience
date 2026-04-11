@@ -204,40 +204,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-        if (session?.user) {
-          await fetchUserProfile(session.user);
-        } else {
-          setUser(null);
-          setDiaryEntries([]);
-          setAnnouncements([]);
-          setStudents([]);
-          setTeachers([]);
-        }
+
+    const handleSession = (session: Session | null) => {
+      if (!mounted) return;
+
+      if (!session?.user) {
+        setUser(null);
+        setDiaryEntries([]);
+        setAnnouncements([]);
+        setStudents([]);
+        setTeachers([]);
+        setLoading(false);
+        return;
+      }
+
+      fetchUserProfile(session.user).finally(() => {
         if (mounted) setLoading(false);
+      });
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        window.setTimeout(() => handleSession(session), 0);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      if (session?.user) {
-        fetchUserProfile(session.user);
-      }
-      setLoading(false);
-    });
-
-    return () => { mounted = false; subscription.unsubscribe(); };
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [fetchUserProfile]);
 
-  // Lazy load data only when user is set
   useEffect(() => {
     if (user) {
       refreshData();
     }
-  }, [user?.id]);
+  }, [user?.id, refreshData]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
